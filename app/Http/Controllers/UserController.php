@@ -6,6 +6,7 @@ use App\Models\Branch;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 use function PHPUnit\Framework\isNull;
 
@@ -14,10 +15,21 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::with('user_branch')->latest()->get();
-        return view('users.users', compact('users'));
+        try{
+            $search = $request->input('search');
+            if($search){
+                $users = User::with('user_branch')->where('user_name', 'like', '%' .$search. '%')->get();
+            }else{
+                $users = User::with('user_branch')->latest()->get();
+            }
+            return view('users.users', compact('users'));
+
+        }catch(Exception $e){
+            Log::info($e->getMessage());
+        }
+
     }
 
     /**

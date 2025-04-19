@@ -1,4 +1,5 @@
 @extends('layouts.main_layouts')
+@section('breadcrumb', 'Branches')
 @section('content')
     <div class="row">
         <div class="col-12 ">
@@ -80,7 +81,7 @@
         </div>
 
         <div class="col-12 ps-3">
-            <button type="button" class="btn btn-outline-secondary px-5">Cancel</button>
+            <button type="button" class="btn btn-outline-secondary px-5" onclick="window.history.back()">Cancel</button>
             <button type="submit" class="btn bg-gradient-dark ms-2 px-5">Submit</button>
         </div>
         </form>

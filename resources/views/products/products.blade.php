@@ -1,5 +1,84 @@
 @extends('layouts.main_layouts')
+@section('breadcrumb', 'Products')
 @section('content')
+<div class="row mb-3">
+    <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+        <div class="card">
+          <div class="card-header p-2 ps-3">
+            <div class="d-flex justify-content-between">
+              <div>
+                <p class="text-sm mb-0 text-capitalize">Total Product</p>
+                <h4 class="mb-0">{{ $products->count() }}</h4>
+              </div>
+            </div>
+          </div>
+          <hr class="dark horizontal my-0">
+          <div class="card-footer p-2 ps-3">
+            <p class="mb-0 text-sm font-weight-bold">All active products recorded</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+        <div class="card">
+          <div class="card-header p-2 ps-3">
+            <div class="d-flex justify-content-between">
+              <div>
+                <p class="text-sm mb-0 text-capitalize">Overall product stock</p>
+                <h4 class="mb-0">
+                    {{
+                        collect($products)->flatMap(function ($product) {
+                            return $product['incoming_stocks'];
+                        })->sum('current_stocks')
+                    }}
+                </h4>
+              </div>
+            </div>
+          </div>
+          <hr class="dark horizontal my-0">
+          <div class="card-footer p-2 ps-3">
+            <p class="mb-0 text-sm font-weight-bold">Represents all product quantities</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+        <div class="card">
+          <div class="card-header p-2 ps-3">
+            <div class="d-flex justify-content-between">
+              <div>
+                <p class="text-sm mb-0 text-capitalize">Products Close to Expiry</p>
+                <h4 class="mb-0">{{ $closeExpired->sum('current_stocks')}}</h4>
+              </div>
+            </div>
+          </div>
+          <hr class="dark horizontal my-0">
+          <div class="card-footer p-2 ps-3">
+            <button class="mb-0 text-sm font-weight-bold text-success text-decoration-underline link-offset-5 bg-transparent border-0 p-0" type="button" data-bs-toggle="modal" data-bs-target="#expiryModal">
+                more
+            </button>
+            @include('components.modal-expiry')
+        </div>
+        </div>
+      </div>
+      <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+        <div class="card">
+          <div class="card-header p-2 ps-3">
+            <div class="d-flex justify-content-between">
+              <div>
+                <p class="text-sm mb-0 text-capitalize">Product Running Low</p>
+                <h4 class="mb-0">{{$runningLow->count() }}</h4>
+              </div>
+            </div>
+          </div>
+          <hr class="dark horizontal my-0">
+          <div class="card-footer p-2 ps-3">
+            <button class="mb-0 text-sm font-weight-bold text-success text-decoration-underline link-offset-5 bg-transparent border-0 p-0" type="button" data-bs-toggle="modal" data-bs-target="#runningLowModal">
+                more
+            </button>
+            @include('components.modal-running-low')
+          </div>
+        </div>
+      </div>
+</div>
     <div class="row">
         <div class="col-12">
             <div class="card my-4">
@@ -19,11 +98,12 @@
                         <div class="d-flex  align-items-center px-3">
                             <div class="ms-auto pe-md-3 d-flex align-items-center">
                                 <div class="input-group input-group-outline">
-                                    <label class="form-label">Type here...</label>
-                                    <input type="text" class="form-control">
-                                    <span class="d-flex align-items-center justify-content-center ms-1">
+                                    <form action="{{ route('products.index') }}" method="GET">
+                                        <input type="search" name="search" value="{{ request('search')}}" class="form-control" placeholder="type here...">
+                                    </form>
+                                    {{-- <span class="d-flex align-items-center justify-content-center ms-1">
                                         <i class="material-symbols-rounded fs-3">tune</i>
-                                    </span>
+                                    </span> --}}
                                 </div>
                             </div>
                         </div>
@@ -53,13 +133,19 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @php
+                                    use Picqer\Barcode\BarcodeGeneratorPNG;
+                                    $generator = new BarcodeGeneratorPNG();
+                                @endphp
                                 @foreach ($products as $product)
                                     <tr>
                                         <td class="align-middle px-4 py-3">
                                             <span class="text-secondary text-xs font-weight-bold">{{ $product->id }}</span>
                                         </td>
                                         <td>
-                                            <p class="text-xs font-weight-bold mb-0">{!! DNS1D::getBarcodeHTML($product->product_code, 'C128') !!}</p>
+                                            {{-- <p class="text-xs font-weight-bold mb-0">{!! DNS1D::getBarcodeHTML($product->product_code, 'C128') !!}</p> --}}
+                                            <img src="data:image/png;base64,{{ base64_encode($generator->getBarcode($product->product_code, $generator::TYPE_CODE_128)) }}" alt="Barcode {{ $product->product_code }}">
+
                                             <p class="text-xs text-secondary mb-0">{{ $product->product_code }}</p>
                                         </td>
                                         <td class="align-middle text-center">
@@ -99,7 +185,6 @@
                                         </td>
                                     </tr>
                                 @endforeach
-
                             </tbody>
                         </table>
                     </div>

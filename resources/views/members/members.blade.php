@@ -1,4 +1,5 @@
 @extends('layouts.main_layouts')
+@section('breadcrumb', 'Members')
 @section('content')
     <div class="row">
         <div class="col-12">
@@ -19,11 +20,12 @@
                         <div class="d-flex  align-items-center px-3">
                             <div class="ms-auto pe-md-3 d-flex align-items-center">
                                 <div class="input-group input-group-outline">
-                                    <label class="form-label">Type here...</label>
-                                    <input type="text" class="form-control">
-                                    <span class="d-flex align-items-center justify-content-center ms-1">
+                                    <form action="{{ route('members.index') }}" method="GET">
+                                        <input type="search" name="search" value="{{ request('search')}}" class="form-control" placeholder="type here...">
+                                    </form>
+                                    {{-- <span class="d-flex align-items-center justify-content-center ms-1">
                                         <i class="material-symbols-rounded fs-3">tune</i>
-                                    </span>
+                                    </span> --}}
                                 </div>
                             </div>
                         </div>
@@ -35,8 +37,8 @@
                                         Member Name</th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                         Phone Number</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
-                                        Point</th>
+                                    {{-- <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Point</th> --}}
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                         Action</th>
                                 </tr>
@@ -53,9 +55,9 @@
                                         <td class="align-middle ">
                                             <span class="text-secondary text-xs font-weight-bold">{{ $member->phone_number }}</span>
                                         </td>
-                                        <td class="align-middle ">
+                                        {{-- <td class="align-middle ">
                                             <span class="text-secondary text-xs font-weight-bold">{{ $member->point ?? "0" }}</span>
-                                        </td>
+                                        </td> --}}
                                         <td class="align-middle d-flex ">
                                             <a href="{{ route('members.update', $member->id) }}">
                                                 <button type="button" class="btn btn-success me-2">Update</button>

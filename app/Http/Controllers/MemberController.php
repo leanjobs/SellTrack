@@ -5,16 +5,28 @@ namespace App\Http\Controllers;
 use App\Models\Member;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class MemberController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $members = Member::all();
-        return view('members.members', compact('members'));
+        try{
+            $search = $request->input('search');
+            if($search){
+                $members = Member::where('member_name', 'like', '%' .$search. '%')->get();
+            }else{
+                $members = Member::all();
+            }
+            return view('members.members', compact('members'));
+
+        }catch(Exception $e){
+            Log::info($e->getMessage());
+        }
+
     }
 
     /**
@@ -34,7 +46,7 @@ class MemberController extends Controller
             $validated = $request->validate([
                 'member_name' => 'string|required',
                 'phone_number' => 'string|min:10|required',
-                'point' => 'integer|nullable'
+                // 'point' => 'integer|nullable'
             ]);
 
             Member::create($validated);
@@ -70,7 +82,7 @@ class MemberController extends Controller
             $validated = $request->validate([
                 'member_name' => 'string|required',
                 'phone_number' => 'string|min:10|required',
-                'point' => 'integer|nullable'
+                // 'point' => 'integer|nullable'
             ]);
 
             $member->update($validated);

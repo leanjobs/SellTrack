@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AnalysisController;
 use App\Http\Controllers\ApiLocation;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BillController;
@@ -18,33 +19,31 @@ Route::get('/login', function () {
     return view('auth.login');
 });
 
+Route::get("/", function(){
+    return view('welcome');
+});
+
 Route::post('login', [AuthController::class, 'login'])->name('login');
+Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 
-// Route::resource('/products', ProductController::class);
-// Route::resource('/categories', CategoryController::class);
-// Route::resource('/members', MemberController::class);
-// Route::resource('/users', UserController::class);
-// Route::resource('/incoming-stocks', IncomingStockController::class);
-// Route::resource('/outgoing-stocks', OutgoingStockController::class);
-// Route::resource('/branches', BranchController::class);
-
-
-// Route::resource('/pos-system', ProductController::class);
-// Route::resource('/analysis', ProductController::class);
-
-
-
-Route::group(['middleware' => ['auth', 'RoleCheck:super_admin, admin, staff']], function(){
+Route::group(['middleware' => ['auth', 'RoleCheck:super_admin,admin,staff']], function(){
     Route::resource('/members', MemberController::class);
     Route::resource('/incoming-stocks', IncomingStockController::class);
     Route::resource('/outgoing-stocks', OutgoingStockController::class);
     Route::resource('/bills', BillController::class);
-    Route::resource('/discounts', DiscountController::class);
 
 
     Route::get('/pos-system',[ PosController::class, 'index'] );
+    // Route::get('/analysis',[ AnalysisController::class, 'index'] );
+    Route::get('/dashboard',[ AnalysisController::class, 'index'] );
+
     Route::get('/filter-products',[ PosController::class, 'filterProducts'])->name('filter.products');
 
+
+});
+
+Route::group(['middleware' => ['auth', 'RoleCheck:super_admin,admin']], function(){
+    Route::resource('/discounts', DiscountController::class);
 
 });
 

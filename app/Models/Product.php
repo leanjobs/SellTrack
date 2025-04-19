@@ -20,4 +20,8 @@ class Product extends Model
     public function incoming_stocks(){
         return $this->hasMany(IncomingStock::class, 'products_id');
     }
+
+    // public function outgoing_stocks(){
+    //     return $this->hasMany(OutgoingStock::class, 'products_id');
+    // }
 }

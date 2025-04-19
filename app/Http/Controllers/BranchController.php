@@ -7,16 +7,28 @@ use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class BranchController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $branches = Branch::all();
-        return view('branches.branches', compact('branches'));
+        try{
+            $search = $request->input('search');
+            if($search){
+                $branches = Branch::where('branch_name', 'like', '%' .$search. '%')->get();
+            }else{
+                $branches = Branch::all();
+            }
+            return view('branches.branches', compact('branches'));
+
+        }catch(Exception $e){
+            Log::info($e->getMessage());
+        }
+
     }
 
     /**

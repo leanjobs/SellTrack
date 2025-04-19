@@ -28,10 +28,9 @@ class PosController extends Controller
     }
 
     public function filterProducts(Request $request){
-        $category_id = $request->category_id;        $userBranchId = Auth::user()->branches_id;
+        $category_id = $request->category_id;
+        $userBranchId = Auth::user()->branches_id;
 
-
-        // dd($category_id);
 
         if($category_id == "all"){
             $products = Product::with(['product_category', 'incoming_stocks' => function ($query) use ($userBranchId){

@@ -16,20 +16,37 @@ class DiscountController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $userBranchId = Auth::user()->branches_id;
-        $userRole = Auth::user()->role;
-        $discounts = Discount::with(['detail_discounts', 'branches'])->where(function ($query) use ($userBranchId, $userRole) {
-            if ($userRole == "super_admin") {
-                $query->where('branches_id', $userBranchId)->orWhere('all_branches', 1);
-            } else {
-                $query->where('branches_id', $userBranchId);
+        try{
+            $userBranchId = Auth::user()->branches_id;
+            $userRole = Auth::user()->role;
+            $search = $request->input('search');
+            if($search){
+                $discounts = Discount::with(['detail_discounts', 'branches'])->where(function ($query) use ($userBranchId, $userRole) {
+                    if ($userRole == "super_admin") {
+                        $query->where('branches_id', $userBranchId)->orWhere('all_branches', 1);
+                    } else {
+                        $query->where('branches_id', $userBranchId);
+                    }
+                })->where('discount_name', 'like', '%' .$search. '%')->where('status', 'active')->latest()->get();
+            }else{
+                $discounts = Discount::with(['detail_discounts', 'branches'])->where(function ($query) use ($userBranchId, $userRole) {
+                    if ($userRole == "super_admin") {
+                        $query->where('branches_id', $userBranchId)->orWhere('all_branches', 1);
+                    } else {
+                        $query->where('branches_id', $userBranchId);
+                    }
+                })->where('status', 'active')->latest()->get();
             }
-        })->where('status', 'active')->latest()->get();
 
 
-        return view('discounts.discounts', compact('discounts'));
+
+            return view('discounts.discounts', compact('discounts'));
+
+        }catch(Exception $e){
+            Log::error($e->getMessage());
+        }
     }
 
     /**
@@ -37,6 +54,7 @@ class DiscountController extends Controller
      */
     public function create(Request $request)
     {
+        $productId = $request->product_id ?? null;
         $type = $request->query('type');
         $userBranchId = Auth::user()->branches_id;
         $userRole = Auth::user()->role;
@@ -46,15 +64,40 @@ class DiscountController extends Controller
         if ($userRole === 'super_admin') {
             $products = Product::with([
                 'product_category',
-                'incoming_stocks'
-            ])->latest()->get();
+                'incoming_stocks' => function ($query) use ($userBranchId) {
+                    $query->where('current_stocks', '>', 0)
+                          ->whereDate('expired', '>=', today());
+                }
+            ])
+            ->whereHas('incoming_stocks', function ($query) use ($userBranchId) {
+                $query->where('current_stocks', '>', 0)
+                      ->whereDate('expired', '>=', today());
+            })
+            ->latest()
+            ->get();
+
         } elseif ($userRole === 'admin') {
-            $products =  Product::with(['product_category', 'incoming_stocks' => function ($query) use ($userBranchId) {
-                $query->where('branches_id', $userBranchId)->whereDate("expired", ">=", today());
-            }])->latest()->get();
+            $products = Product::with([
+                'product_category',
+                'incoming_stocks' => function ($query) use ($userBranchId) {
+                    $query->where('branches_id', $userBranchId)
+                          ->where('current_stocks', '>', 0)
+                          ->whereDate('expired', '>=', today());
+                }
+            ])
+            ->whereHas('incoming_stocks', function ($query) use ($userBranchId) {
+                $query->where('branches_id', $userBranchId)
+                      ->where('current_stocks', '>', 0)
+                      ->whereDate('expired', '>=', today());
+            })
+            ->latest()
+            ->get();
+
         }
 
-        return view('discounts.create', compact(['type', 'products', 'branches']));
+        Log::info(['type' => $type, 'productId' => $productId]);
+
+        return view('discounts.create', compact(['type', 'products', 'branches', 'productId']));
     }
 
     /**
@@ -64,6 +107,8 @@ class DiscountController extends Controller
     {
         try {
             Log::info('requestt', $request->all());
+            $userBranchId = Auth::user()->branches_id;
+            $userRole = Auth::user()->role;
 
             $validated = $request->validate([
                 'discount_name' => 'required|string',
@@ -82,6 +127,25 @@ class DiscountController extends Controller
                 'min_total_price' => 'nullable|numeric'
             ]);
             Log::info('validated', $validated);
+
+            $check_discount = Discount::where('start_date', '<=', now())
+            ->where('end_date', '>=', now())
+            ->where('status', 'active')
+            ->where('deleted_at', null)
+            ->whereHas('detail_discounts', function ($query) use ($validated) {
+                $query->where('products_id', $validated['products_id']);
+            })->where(function ($query) use ($userBranchId, $userRole) {
+                if ($userRole == "super_admin") {
+                    $query->where('branches_id', $userBranchId)
+                          ->orWhere('all_branches', 1);
+                } else {
+                    $query->where('branches_id', $userBranchId);
+                }
+            })->latest() ->get();
+            Log::info($check_discount);
+            if ($check_discount->isNotEmpty()) {
+                return redirect()->back()->with('error', "One of the products has an active discount.");
+            }
 
             $detail_discount = DetailDiscount::create([
                 // 'discounts_id' => $discount->id,

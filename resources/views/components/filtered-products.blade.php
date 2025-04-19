@@ -1,6 +1,6 @@
 @foreach ($products as $product )
 <div class="col-md-3 col-sm-4 col-6 py-2">
-    <button class="btn border-0  w-100 p-0 product_item" {{ $product->incoming_stocks->sum('current_stocks') < 1 ? 'disabled' : '' }} id="{{ $product->id}}">
+    <button class="btn border-0  w-100 p-0 product_item" {{ $product->incoming_stocks->sum('current_stocks') < 1 ? 'disabled' : '' }} id="{{ $product->id}}" data-code="{{ $product->product_code}}">
         <div class="card">
             <div class="card-header mt-1 text-center">
                 <img src="{{ asset('storage/'.$product->product_img) }}" alt="product img"

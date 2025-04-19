@@ -1,4 +1,5 @@
 @extends('layouts.main_layouts')
+@section('breadcrumb', 'Incoming Stocks')
 @section('content')
     <div class="row">
         <div class="col-12 ">

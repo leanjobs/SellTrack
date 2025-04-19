@@ -16,4 +16,7 @@ class IncomingStock extends Model
     public function product_detail(){
         return $this->belongsTo(Product::class, 'products_id');
     }
+    public function outgoing_stocks(){
+        return $this->hasMany(OutgoingStock::class, 'incoming_stocks_id');
+    }
 }

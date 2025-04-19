@@ -12,4 +12,11 @@ class DetailBill extends Model
     use SoftDeletes;
     protected $table = "detail_bills";
     protected $guarded = [];
+
+    public function product(){
+        return $this->belongsTo(Product::class, 'products_id');
+    }
+    public function discount(){
+        return $this->belongsTo(Discount::class, 'discounts_id');
+    }
 }

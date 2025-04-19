@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('notifications', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('branches_id')->constrained('branches', 'id');
-            $table->string('messages');
-            $table->enum('status', ['read', 'unread']);
-            $table->softDeletes();
-            $table->timestamps();
-        });
+        // Schema::create('notifications', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->foreignId('branches_id')->constrained('branches', 'id');
+        //     $table->string('messages');
+        //     $table->enum('status', ['read', 'unread']);
+        //     $table->softDeletes();
+        //     $table->timestamps();
+        // });
     }
 
     /**
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('notifications');
+        // Schema::dropIfExists('notifications');
     }
 };

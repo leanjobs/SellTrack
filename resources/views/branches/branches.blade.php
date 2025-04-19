@@ -1,4 +1,5 @@
 @extends('layouts.main_layouts')
+@section('breadcrumb', 'Branches')
 @section('content')
     <div class="row">
         <div class="col-12">
@@ -19,11 +20,12 @@
                         <div class="d-flex  align-items-center px-3">
                             <div class="ms-auto pe-md-3 d-flex align-items-center">
                                 <div class="input-group input-group-outline">
-                                    <label class="form-label">Type here...</label>
-                                    <input type="text" class="form-control">
-                                    <span class="d-flex align-items-center justify-content-center ms-1">
+                                    <form action="{{ route('branches.index') }}" method="GET">
+                                        <input type="search" name="search" value="{{ request('search')}}" class="form-control" placeholder="type here...">
+                                    </form>
+                                    {{-- <span class="d-flex align-items-center justify-content-center ms-1">
                                         <i class="material-symbols-rounded fs-3">tune</i>
-                                    </span>
+                                    </span> --}}
                                 </div>
                             </div>
                         </div>

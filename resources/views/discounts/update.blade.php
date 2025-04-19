@@ -1,4 +1,5 @@
 @extends('layouts.main_layouts')
+@section('breadcrumb', 'Discounts')
 @section('content')
     <div class="row">
         <div class="col-12 ">
@@ -338,34 +339,6 @@
                 allowClear: true
             });
 
-            // $('#type').change(function() {
-            //     var selectedType = $(this).val();
-
-            //     if (selectedType && selectedType !== "") {
-            //         localStorage.setItem('discount_type', selectedType);
-            //         $('#next-btn').prop('disabled', false);
-            //     } else {
-            //         $('#next-btn').prop('disabled', true);
-            //     }
-            // });
-
-            // var storedDiscountType = localStorage.getItem('discount_type');
-            // if (storedDiscountType) {
-            //     $('#hidden_discount_type').val(storedDiscountType);
-            //     $('#type').val(storedDiscountType).trigger('change');
-            //     $('#next-btn').prop('disabled', false);
-            // } else {
-            //     $('#type').val(null).trigger('change');
-            //     $('#next-btn').prop('disabled', true);
-            // }
-
-            // $('#next-btn').click(function() {
-            //     var selectedType = $('#type').val();
-            //     if (selectedType) {
-            //         console.log(selectedType);
-            //         window.location.href = `{{ route('discounts.create') }}?type=${selectedType}`;
-            //     }
-            // });
 
             function toggleBranchSelection() {
                 if ($('#all_branches').is(':checked')) {

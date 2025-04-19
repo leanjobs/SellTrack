@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('members', function (Blueprint $table) {
             $table->id();
             $table->string('member_name');
-            $table->integer('point')->default(0)->nullable();
+            // $table->integer('point')->default(0)->nullable();
             $table->string('phone_number');
             $table->softDeletes();
             $table->timestamps();

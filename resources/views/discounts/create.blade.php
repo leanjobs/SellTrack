@@ -1,4 +1,5 @@
 @extends('layouts.main_layouts')
+@section('breadcrumb', 'Discounts')
 @section('content')
     <div class="row">
         <div class="col-12 ">
@@ -25,6 +26,7 @@
                                 <label class="form-label">End Date</label>
                                 <input type="date" name="end_date" class="form-control border p-2" required>
                             </div>
+                             <input type="hidden" name="type" id="type" id="type" class="form-control">
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -37,7 +39,7 @@
                                         <option value="{{ $product->id }}" data-name="{{ $product->product_name }}"
                                             data-code="{{ $product->product_code }}"
                                             data-stocks="{{ $product->incoming_stocks->sum('current_stocks') ?? 0 }}"
-                                            data-price="{{ $product->price }}">{{ $product->product_name }} -
+                                            data-price="{{ $product->price }}" {{$product->id == ($productId ?? "") ? "selected" : ""}}>{{ $product->product_name }} -
                                             {{ $product->product_code }}</option>
                                     @endforeach
                                 </select>
@@ -118,6 +120,7 @@
                                 <label class="form-label">End Date</label>
                                 <input type="date" name="end_date" class="form-control border p-2" required>
                             </div>
+                             <input type="hidden" name="type" id="type" class="form-control">
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -130,7 +133,7 @@
                                         <option value="{{ $product->id }}" data-name="{{ $product->product_name }}"
                                             data-code="{{ $product->product_code }}"
                                             data-stocks="{{ $product->incoming_stocks->sum('current_stocks') ?? 0 }}"
-                                            data-price="{{ $product->price }}">{{ $product->product_name }} -
+                                            data-price="{{ $product->price }}" {{$product->id == ($productId ?? "") ? "selected" : ""}}>{{ $product->product_name }} -
                                             {{ $product->product_code }}</option>
                                     @endforeach
                                 </select>
@@ -183,6 +186,7 @@
                                 <label class="form-label">End Date</label>
                                 <input type="date" name="end_date" class="form-control border p-2" required>
                             </div>
+                            <input type="hidden" name="type" id="type" class="form-control">
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -191,7 +195,7 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Product Discount</label>
-                                <select name="free_products_id" id="free_products_id"
+                                <select name="products_id" id="products_id"
                                     class="form-select select2 bg-transparent border p-2"
                                     aria-label="Default select example">
                                     <option value="" selected disabled>Select and search</option>
@@ -199,31 +203,31 @@
                                         <option value="{{ $product->id }}" data-name="{{ $product->product_name }}"
                                             data-code="{{ $product->product_code }}"
                                             data-stocks="{{ $product->incoming_stocks->sum('current_stocks') ?? 0 }}"
-                                            data-price="{{ $product->price }}">{{ $product->product_name }} -
+                                            data-price="{{ $product->price }}"  {{$product->id == ($productId ?? "") ? "selected" : ""}}>{{ $product->product_name }} -
                                             {{ $product->product_code }}</option>
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="mb-3" id="free_product_detail" style="display: none">
+                            <div class="mb-3" id="product_detail" style="display: none">
                                 <p class="text-md text-bold mb-0">Product Details</p>
                                 <div class="row">
                                     <div class="col-md-6">
                                         <p class="text-sm mb-0"><span class="text-bold">Name :</span> <span
-                                                id="free_product_name"></span></p>
+                                                id="product_name"></span></p>
                                         <p class="text-sm mb-0"><span class="text-bold">Code :</span> <span
-                                                id="free_product_code"></span></p>
+                                                id="product_code"></span></p>
                                     </div>
                                     <div class="col-md-6">
                                         <p class="text-sm  mb-0"><span class="text-bold">Stock :</span> <span
-                                                id="free_product_stocks"></span></p>
+                                                id="product_stocks"></span></p>
                                         <p class="text-sm  mb-0"><span class="text-bold">Price :</span> <span
-                                                id="free_product_price"></span></p>
+                                                id="product_price"></span></p>
                                     </div>
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Quantity Free Prodcut</label>
-                                <input type="number" name="quantity_free_products" id="quantity_free_products"
+                                <input type="number" name="min_quantity" id="min_quantity"
                                     class="form-control border p-2" required disabled>
                             </div>
                             <div class="mb-3">
@@ -249,6 +253,7 @@
                                 <label class="form-label">End Date</label>
                                 <input type="date" name="end_date" class="form-control border p-2" required>
                             </div>
+                            <input type="hidden" name="type" id="type" class="form-control">
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -256,12 +261,12 @@
                                 <select name="products_id" id="products_id"
                                     class="form-select select2 bg-transparent border p-2"
                                     aria-label="Default select example">
-                                    <option value="" selected disabled>Select and search</option>
+                                    <option value="" selected disabled >Select and search</option>
                                     @foreach ($products as $product)
                                         <option value="{{ $product->id }}" data-name="{{ $product->product_name }}"
                                             data-code="{{ $product->product_code }}"
                                             data-stocks="{{ $product->incoming_stocks->sum('current_stocks') ?? 0 }}"
-                                            data-price="{{ $product->price }}">{{ $product->product_name }} -
+                                            data-price="{{ $product->price }}"  {{$product->id == ($productId ?? "") ? "selected" : ""}}>{{ $product->product_name }} -
                                             {{ $product->product_code }}</option>
                                     @endforeach
                                 </select>
@@ -315,6 +320,7 @@
                         </div>
                     </div>
                 @endif
+
                 <div class="col-12 ps-3">
                     <button type="button" class="btn btn-outline-secondary px-5"
                         onclick="window.history.back()">Back</button>
@@ -361,9 +367,11 @@
 
             $('#next-btn').click(function() {
                 var selectedType = $('#type').val();
+
                 if (selectedType) {
                     console.log(selectedType);
-                    window.location.href = `{{ route('discounts.create') }}?type=${selectedType}`;
+                    const productId = @json($productId ??  null);
+                    window.location.href = `{{ route('discounts.create') }}?type=${selectedType}` + (productId ? `&product_id=${productId}`: '');
                 }
             });
 
@@ -387,19 +395,14 @@
                 let productName = selectedProduct.data('name');
                 let productCode = selectedProduct.data('code');
                 let productPrice = selectedProduct.data('price');
-                let productStocks = selectedProduct.data('stocks');
+                let productStocks = selectedProduct.data('stocks') ?? 0;
 
-                if (productCode && productName && productPrice && productStocks) {
-                    $(`#${detailIdPrefix}_name`).text(productName);
+                $(`#${detailIdPrefix}_name`).text(productName);
                     $(`#${detailIdPrefix}_code`).text(productCode);
                     $(`#${detailIdPrefix}_price`).text("Rp " + parseInt(productPrice).toLocaleString("id-ID"));
                     $(`#${detailIdPrefix}_stocks`).text(productStocks);
 
                     $(`#${detailIdPrefix}_detail`).show();
-                } else {
-                    $(`#${detailIdPrefix}_detail`).hide();
-                }
-
 
             }
 
@@ -411,6 +414,10 @@
                 $('#discount_price').attr('max', price);
 
             });
+
+           if($('#products_id').val()){
+                $('#products_id').trigger('change');
+            }
 
 
             $('#free_products_id').change(function() {
@@ -465,9 +472,6 @@
                 'input[name="discount_price"]');
             setDependentInput('#products_id', '#discount_price');
             setDependentInput('#products_id', '#min_quantity');
-            setDependentInput('#free_products_id', '#quantity_free_products');
-            setDependentInput('#free_products_id', '#discount_price');
-
 
         });
     </script>

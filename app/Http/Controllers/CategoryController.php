@@ -5,17 +5,26 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class CategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
-        $categories = Category::all();
-        return view('categories.categories', compact('categories'));
+        try{
+            $search = $request->input('search');
+            if($search){
+                $categories = Category::where('category_name', 'like', '%' .$search. '%')->get();
+            }else{
+                $categories = Category::all();
+            }
+            return view('categories.categories', compact('categories'));
+        }catch(Exception $e){
+            Log::info($e->getMessage());
+        }
     }
 
     /**

@@ -7,6 +7,7 @@ use App\Models\Product;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class IncomingStockController extends Controller
@@ -14,11 +15,32 @@ class IncomingStockController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $incomingStocks = IncomingStock::with('product_detail')->latest()->get();
+        try{
+            $userBranchId = Auth::user()->branches_id;
+            $search = $request->input('search');
 
-        return view('incoming-stocks.incoming-stocks', compact('incomingStocks'));
+            if($search){
+                $incomingStocks = IncomingStock::with('product_detail')
+                ->where('branches_id', $userBranchId)
+                ->when($search, function ($query, $search) {
+                    $query->whereHas('product_detail', function ($q) use ($search) {
+                        $q->where('product_name', 'like', '%' . $search . '%');
+                    });
+                })
+                ->latest()
+                ->get();
+            }else{
+                $incomingStocks = IncomingStock::with('product_detail')->where('branches_id', $userBranchId)->latest()->get();
+            }
+
+
+            return view('incoming-stocks.incoming-stocks', compact('incomingStocks'));
+        }catch(Exception $e){
+            Log::info($e->getMessage());
+
+        }
     }
 
     /**

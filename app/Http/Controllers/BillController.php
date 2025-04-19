@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Bill;
 use App\Models\DetailBill;
+use App\Models\DetailDiscount;
 use App\Models\IncomingStock;
 use App\Models\OutgoingStock;
 use App\Models\Payment;
@@ -19,7 +20,11 @@ class BillController extends Controller
      */
     public function index()
     {
-        //
+        $userBranchId = Auth::user()->branches_id;
+        $bills = Bill::with(['users', 'member', 'payment'])->where('branches_id', $userBranchId)->latest()->get();
+        // $bills->load(['users', 'member', 'payment']);
+
+        return view('bills.bills', compact('bills'));
     }
 
     /**
@@ -36,7 +41,11 @@ class BillController extends Controller
     public function store(Request $request)
     {
         try {
+            $userBranchId = Auth::user()->branches_id;
+            $detail_bills = [];
             Log::info("request bills", $request->all());
+
+
 
             $validated = $request->validate([
                 "members_id" => 'nullable|exists:members,id',
@@ -69,6 +78,8 @@ class BillController extends Controller
                 "tax" => $validated['tax'],
             ]);
 
+            $bill->load(['member', 'branch', 'users']);
+
             foreach ($validated['items'] as $item) {
                 $detail_bill = DetailBill::create([
                     "branches_id" => $validated['branches_id'],
@@ -78,8 +89,10 @@ class BillController extends Controller
                     "quantity" => $item['quantity'],
                     "discounts_id" => $item['discounts_id'],
                 ]);
+                $detail_bill->load(['product', 'discount']);
+                $detail_bills[] = $detail_bill;
                 Log::info($detail_bill);
-                $incoming_stocks = IncomingStock::where("products_id", $item['product_id'])->where("current_stocks", '>', 0)->whereDate("expired", ">=", today())->orderBy("expired", 'asc')->get();
+                $incoming_stocks = IncomingStock::where("products_id", $item['product_id'])->where('branches_id', $userBranchId)->where("current_stocks", '>', 0)->whereDate("expired", ">=", today())->orderBy("expired", 'asc')->get();
 
                 $quantityToDeduct = $item['quantity'];
 
@@ -97,8 +110,14 @@ class BillController extends Controller
                     $quantityToDeduct -= $deduct;
                 }
             }
+
+            $data = [
+                'bill' => $bill,
+                'detail_bill' => $detail_bills
+            ];
+            Log::info($data);
             // return redirect()->back()->with('success', 'successfully');
-            return response()->json(['message' => 'successfully']);
+            return response()->json(['message' => 'successfully','data' => $data]);
         } catch (Exception $e) {
             Log::info( $e->getMessage());
             return redirect()->back()->with('error', 'error');
@@ -110,7 +129,22 @@ class BillController extends Controller
      */
     public function show(Bill $bill)
     {
-        //
+        try{
+            $bill->load(['member', 'branch', 'users']);
+            $detail_bills = DetailBill::where('bills_id', $bill->id)->latest()->get();
+            foreach($detail_bills as $detail_bill){
+                $detail_bill->load(['product', 'discount']);
+            }
+            $data = [
+                'bill' => $bill,
+                'detail_bill' => $detail_bills
+            ];
+            return response()->json(['message' => 'successfully','data' => $data]);
+        }catch(Exception $e){
+            Log::info( $e->getMessage());
+            return redirect()->back()->with('error', $e->getMessage());
+
+        }
     }
 
     /**

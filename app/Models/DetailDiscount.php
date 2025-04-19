@@ -18,7 +18,7 @@ class DetailDiscount extends Model
     }
 
     public function free_product(){
-        return $this->belongsTo(Product::class, 'free_products_id');
+        return $this->belongsTo(Product::class, 'products_id');
     }
 
     public function product(){

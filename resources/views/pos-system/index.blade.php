@@ -1,9 +1,33 @@
 @extends('layouts.main_layouts')
+@section('breadcrumb', 'Cashier')
 @section('content')
     <div class="row">
         <div class="col-xl-7">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="">
+                    <h3 class="mb-0 h4 font-weight-bolder ">Cashier</h3>
+                    <p class="mb-0">{{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}</p>
+                </div>
+                <div>
+                    <select name="set-select-item" class="form-select border " aria-label="Default select example"
+                        id="set-select-item">
+                        {{-- <option value="" selected disabled>-- Select a time --</option> --}}
+                        <option value="list" selected>-- List --</option>
+                        <option value="scan">-- Scan --</option>
+                    </select>
+                </div>
+            </div>
+            {{-- scanner --}}
+            <div id="scan-section" class="d-none">
+                <div id="reader"></div>
+                <div id="scan-result" class="d-none">
+                    <p id="prodcut-code">hello</p>
+                    <input type="hidden" id="scan-product-code" name="scan-product-code">
+                    <button id="start-scan" class="btn btn-dark">Start Scan</button>
+                </div>
+            </div>
             {{-- category section --}}
-            <div class="d-flex overflow-x-auto gap-3" style="max-width: 100%; white-space: nowrap;">
+            <div class="d-flex overflow-x-auto gap-3" id="category-section" style="max-width: 100%; white-space: nowrap;">
                 <div class="col-3 pb-3">
                     <button class="btn border-0  w-100 p-0 filter_category" data-category="all">
                         <div class="card bg-dark">
@@ -58,13 +82,19 @@
                 @endforeach --}}
             </div>
         </div>
+        {{-- invoice section --}}
         <div class="col-xl-5">
             <div class="card p-4" style="max-height: 100%">
+                <div class="d-flex justify-content-between">
                 <h3>Invoice</h3>
+                <button class="btn d-flex align-items-center bg-dark rounded" id="btn-refresh">
+                    <i class="material-symbols-rounded fs-5 text-white">refresh</i>
+                  </button>
+                </div>
                 <div class="mb-3">
                     <div class="d-flex align-items-center mb-2">
                         <h5 class="mb-0 text-dark pe-3">Members</h5>
-                        <a href="{{ route('incoming-stocks.create') }}"
+                        <a href="{{ route('members.create') }}"
                             class="d-flex align-items-center bg-dark rounded-circle">
                             <i class="material-symbols-rounded fs-5 text-white">add</i>
                         </a>
@@ -84,121 +114,127 @@
                     <p class="text-sm mb-0 text-start"><span class="text-bold">Phone Number :</span> <span
                             id="member_phone"></span></p>
                 </div>
-                <div class="overflow-y-auto mb-3" style="max-height: 50vh; overflow-y: auto;" id="cart_items">
-                    {{-- <div class="row d-flex align-items-center mb-3">
-                        <div class="col-3">
-                            <img src="{{ asset('assets/img/meeting.jpg') }}" alt="product img"
-                                style="height: 90px; width:90px;  object-fit: cover;">
-                        </div>
-                        <div class="col-9">
-                            <div class="d-flex justify-content-between">
-                                <p class="text-dark fs-6 fw-bold">Producttt</p>
-                                <i class="material-symbols-rounded fs-5 text-dark">delete</i>
+                <div class="" id="bill-section">
+                    <div class="overflow-y-auto mb-3" style="max-height: 50vh; overflow-y: auto;" id="cart_items">
+                        {{-- <div class="row d-flex align-items-center mb-3">
+                            <div class="col-3">
+                                <img src="{{ asset('assets/img/meeting.jpg') }}" alt="product img"
+                                    style="height: 90px; width:90px;  object-fit: cover;">
                             </div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="d-flex">
-                                    <button class="btn border-0  w-100 p-0">
-                                        <i
-                                        class="material-symbols-rounded fs-5 text-dark d-flex align-items-center border border-dark rounded-circle p-1 border-2">add</i>
-                                    </button>
-                                    <p class="text-dark fs-6 fw-bold px-4 mb-0">1</p>
-                                    <button class="btn border-0  w-100 p-0">
-                                        <i class="material-symbols-rounded fs-5 text-dark d-flex align-items-center border border-dark rounded-circle p-1 border-2">remove</i>
-                                    </button>
+                            <div class="col-9">
+                                <div class="d-flex justify-content-between">
+                                    <p class="text-dark fs-6 fw-bold">Producttt</p>
+                                    <i class="material-symbols-rounded fs-5 text-dark">delete</i>
                                 </div>
-                                <div class="text-end">
-                                    <p class="text-dark fs-6 fw-bold mb-0">Rp 20.000</p>
-                                    <p class="text-dark fs-6 fw-bold mb-0">Rp 200.000</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex">
+                                        <button class="btn border-0  w-100 p-0">
+                                            <i
+                                            class="material-symbols-rounded fs-5 text-dark d-flex align-items-center border border-dark rounded-circle p-1 border-2">add</i>
+                                        </button>
+                                        <p class="text-dark fs-6 fw-bold px-4 mb-0">1</p>
+                                        <button class="btn border-0  w-100 p-0">
+                                            <i class="material-symbols-rounded fs-5 text-dark d-flex align-items-center border border-dark rounded-circle p-1 border-2">remove</i>
+                                        </button>
+                                    </div>
+                                    <div class="text-end">
+                                        <p class="text-dark fs-6 fw-bold mb-0">Rp 20.000</p>
+                                        <p class="text-dark fs-6 fw-bold mb-0">Rp 200.000</p>
 
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div> --}}
-                </div>
-                <div id="selected_cheap_redemptions">
-                    {{-- <div class="mb-3 p-3 border border-dark rounded selected_cheap_redemption"  style="min-width: 100%; max-width:100%" >
-                        <div class="d-flex justify-content-between">
-                        <p class="fs-6 text-dark mb-0 text-m text-bold">Tebus Murah</p>
-                        <button type="button" class="btn bg-success mb-2 px-2 py-1 text-white">Add</button>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <p class="fs-6 text-dark mb-0 ">Min. Total Price</p>
-                            <p class="fs-6 text-dark mb-0 ">Rp 100.000</p>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <p class="fs-6 text-dark mb-0 ">SUSU - 010101010</p>
-                            <p class="fs-6 text-dark mb-0 ">x1</p>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <p class="fs-6 text-dark mb-0 "></p>
-                            <p class="fs-6 text-dark mb-0 ">Rp 10.000</p>
-                        </div>
-                    </div> --}}
-                </div>
-                <h5 class="mb-2 text-dark">Cheap Redemptions</h5>
-                <div class="d-flex overflow-x-auto gap-3" style="max-width: 100%; white-space: nowrap;"
-                    id="cheap_redemptions_items">
-                    @foreach ($discounts as $discount)
-                        @if ($discount->type === 'cheap_redemption')
-                            <div class="mb-3 p-3 border border-gray-400 rounded cheap_redemption_item"
-                                style="min-width: 100%; max-width:100%" data-id="{{ $discount->id }}"
-                                data-min-price="{{ $discount->detail_discounts->min_total_price }}"
-                                data-discount-price="{{ $discount->detail_discounts->discount_price }}"
-                                data-free-products-id="{{ $discount->detail_discounts->free_products_id }}"
-                                data-free-quantity="{{ $discount->detail_discounts->quantity_free_products }}">
-                                <div class="d-flex justify-content-between">
-                                    <p class="fs-6 text-gray-400 mb-0 text-m text-bold discount_name ">
-                                        {{ $discount->discount_name }}</p>
-                                    <button type="button" class="btn bg-success mb-2 px-2 py-1 text-white"
-                                        disabled>Add</button>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <p class="fs-6 text-gray-400 mb-0">Min. Total Price</p>
-                                    <p class="fs-6 text-gray-400 mb-0 min_price">Rp
-                                        {{ number_format($discount->detail_discounts->min_total_price, 0, ',', '.') }}</p>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <p class="fs-6 text-gray-400 mb-0 detail_free_product">
-                                        {{ $discount->detail_discounts->free_product->product_name }} -
-                                        {{ $discount->detail_discounts->free_product->product_code }}</p>
-                                    <p class="fs-6 text-gray-400 mb-0 ">
-                                        x{{ $discount->detail_discounts->quantity_free_products }}</p>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <p class="fs-6 text-gray-400 mb-0 "></p>
-                                    <p class="fs-6 text-gray-400 mb-0 discount_price">Rp
-                                        {{ number_format($discount->detail_discounts->discount_price, 0, ',', '.') }}</p>
-                                </div>
+                        </div> --}}
+                    </div>
+                    <div id="selected_cheap_redemptions">
+                        {{-- <div class="mb-3 p-3 border border-dark rounded selected_cheap_redemption"  style="min-width: 100%; max-width:100%" >
+                            <div class="d-flex justify-content-between">
+                            <p class="fs-6 text-dark mb-0 text-m text-bold">Tebus Murah</p>
+                            <button type="button" class="btn bg-success mb-2 px-2 py-1 text-white">Add</button>
                             </div>
-                        @endif
-                    @endforeach
+                            <div class="d-flex justify-content-between">
+                                <p class="fs-6 text-dark mb-0 ">Min. Total Price</p>
+                                <p class="fs-6 text-dark mb-0 ">Rp 100.000</p>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <p class="fs-6 text-dark mb-0 ">SUSU - 010101010</p>
+                                <p class="fs-6 text-dark mb-0 ">x1</p>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <p class="fs-6 text-dark mb-0 "></p>
+                                <p class="fs-6 text-dark mb-0 ">Rp 10.000</p>
+                            </div>
+                        </div> --}}
+                    </div>
+                    <h5 class="mb-2 text-dark">Cheap Redemptions</h5>
+                    <div class="d-flex overflow-x-auto gap-3" style="max-width: 100%; white-space: nowrap;"
+                        id="cheap_redemptions_items">
+                        @foreach ($discounts as $discount)
+                            @if ($discount->type === 'cheap_redemption')
+                                <div class="mb-3 p-3 border border-gray-400 rounded cheap_redemption_item"
+                                    style="min-width: 100%; max-width:100%" data-id="{{ $discount->id }}"
+                                    data-min-price="{{ $discount->detail_discounts->min_total_price }}"
+                                    data-discount-price="{{ $discount->detail_discounts->discount_price }}"
+                                    data-products-id="{{ $discount->detail_discounts->products_id }}"
+                                    data-quantity="{{ $discount->detail_discounts->min_quantity }}">
+                                    <div class="d-flex justify-content-between">
+                                        <p class="fs-6 text-gray-400 mb-0 text-m text-bold discount_name ">
+                                            {{ $discount->discount_name }}</p>
+                                        <button type="button" class="btn bg-success mb-2 px-2 py-1 text-white"
+                                            disabled>Add</button>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <p class="fs-6 text-gray-400 mb-0">Min. Total Price</p>
+                                        <p class="fs-6 text-gray-400 mb-0 min_price">Rp
+                                            {{ number_format($discount->detail_discounts->min_total_price, 0, ',', '.') }}
+                                        </p>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <p class="fs-6 text-gray-400 mb-0 detail_product">
+                                            {{ $discount->detail_discounts->free_product->product_name }} -
+                                            {{ $discount->detail_discounts->free_product->product_code }}</p>
+                                        <p class="fs-6 text-gray-400 mb-0 ">
+                                            x{{ $discount->detail_discounts->min_quantity }}</p>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <p class="fs-6 text-gray-400 mb-0 "></p>
+                                        <p class="fs-6 text-gray-400 mb-0 discount_price">Rp
+                                            {{ number_format($discount->detail_discounts->discount_price, 0, ',', '.') }}
+                                        </p>
+                                    </div>
+                                </div>
+                            @endif
+                        @endforeach
+                    </div>
+                    <div class="mb-3">
+                        <h5 class="mb-0 text-dark">Payement Summary</h5>
+                        <div class="d-flex justify-content-between">
+                            <p class="fs-6 text-dark mb-0">Total Price</p>
+                            <p class="fs-6 text-dark mb-0 total_price">Rp 0</p>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <p class="fs-6 text-dark mb-0">Tax</p>
+                            <p class="fs-6 text-dark mb-0 tax">Rp 0</p>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <h5 class="fs-5 fw-bold text-dark mb-0">Grand Total</h5>
+                            <h5 class="fs-5 fw-bold text-dark mb-0 grand_total">Rp 0</h5>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <h5 class="mb-0 text-dark">Payement Summary</h5>
-                    <div class="d-flex justify-content-between">
-                        <p class="fs-6 text-dark mb-0">Total Price</p>
-                        <p class="fs-6 text-dark mb-0 total_price">Rp 0</p>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <p class="fs-6 text-dark mb-0">Tax</p>
-                        <p class="fs-6 text-dark mb-0 tax">Rp 0</p>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <h5 class="fs-5 fw-bold text-dark mb-0">Grand Total</h5>
-                        <h5 class="fs-5 fw-bold text-dark mb-0 grand_total">Rp 0</h5>
-                    </div>
-                </div>
+
                 <div class="d-flex justify-content-center mb-3 ">
                     <button class="btn border-0 p-1 mx-3 payment_method active">
                         <i class="material-symbols-rounded fs-2 text-white d-flex align-items-center border border-dark rounded p-1 border-2 p-2  bg-dark "
                             data-method="cash">payments</i>
                     </button>
-                    <button class="btn border-0 p-1 mx-3 payment_method">
+                    {{-- <button class="btn border-0 p-1 mx-3 payment_method">
                         <i class="material-symbols-rounded fs-2 text-dark d-flex align-items-center border border-dark rounded p-1 border-2 p-2 "
                             data-method="qr">qr_code_scanner</i>
-                    </button>
+                    </button> --}}
                 </div>
                 <div class="mb-3 d-flex justify-content-center">
+                    @include('components.modal-receipt')
                     <button type="button" class="btn bg-gradient-dark w-100 btn_place_order" disabled>Place an
                         Order</button>
                 </div>
@@ -207,11 +243,122 @@
     </div>
     <script>
         $(document).ready(function() {
+            function BillSavedToLocalStorage() {
+                var billHtml = $('#bill-section').html();
+                localStorage.setItem('billHtml', billHtml);
+            }
+
+            function ProductSavedToLocalStorage() {
+                var productsList = $('#products_list').html();
+                localStorage.setItem('productsList', productsList);
+            }
+
+            function MemberSavedToLocalStorage() {
+                var memberId = $("#members_id").val()
+                localStorage.setItem('memberId', memberId);
+            }
+
+            var billHtml = localStorage.getItem('billHtml');
+            var productsList = localStorage.getItem('productsList');
+            var memberId = localStorage.getItem('memberId');
+            if (billHtml) {
+                $('#bill-section').html(billHtml);
+                updateSummary();
+            }
+
+            if (productsList) {
+                $('#products_list').html(productsList);
+            }
+
+            if (memberId) {
+                $("#members_id option").each(function() {
+                    if ($(this).val() == memberId) {
+                        $(this).attr('selected', 'selected');
+                    }
+                });
+            }
+
             $('#members_id').select2({
                 theme: 'bootstrap-5',
                 width: '100%',
                 placeholder: "-- Search Member's Phone Number --",
                 allowClear: true
+            });
+
+            let html5QRCodeScanner = new Html5QrcodeScanner(
+                "reader", {
+                    fps: 2,
+                    qrbox: 300,
+                }
+            );
+
+            function onScanSuccess(decodedText, decodedResult) {
+                console.log("decode", decodedResult.decodedText);
+                $('#prodcut-code').text("Hasil Scan: " + decodedText);
+                $('#scan-product-code').val(decodedText);
+
+                let scannedProduct = $(`.product_item[data-code="${decodedText}"]`);
+                if (scannedProduct.length > 0) {
+                    scannedProduct.trigger('click');
+                    html5QRCodeScanner.pause();
+                    $('#scan-result').removeClass('d-none');
+                    $('#scan-result').addClass('d-flex justify-content-between');
+
+                } else {
+                    console.log("Produk tidak ditemukan dari hasil scan:", decodedText);
+                }
+            }
+
+            html5QRCodeScanner.render(onScanSuccess);
+
+            $('#start-scan').on('click', function() {
+                $('#scan-result').addClass('d-none');
+                $('#scan-result').removeClass('d-flex justify-content-between');
+                html5QRCodeScanner.resume();
+            });
+
+            $('#set-select-item').on('change', function() {
+                let selected = $(this).val();
+
+                if (selected === 'scan') {
+                    $('#category-section').addClass('d-none');
+                    $('#products_list').addClass('d-none');
+                    $('#scan-section').removeClass('d-none');
+                    // $('#scan-result').removeClass('d-none');
+                    // $('#scan-result').addClass('d-flex justify-content-between');
+
+                    if ($('#reader').is(':empty')) {
+                        console.log("teste")
+
+                        html5QRCodeScanner.render(onScanSuccess);
+                    }
+
+                } else if (selected === 'list') {
+                    $('#category-section').removeClass('d-none');
+                    $('#products_list').removeClass('d-none');
+                    $('#scan-result').addClass('d-none');
+                    $('#scan-result').removeClass('d-flex justify-content-between');
+
+
+                    html5QRCodeScanner.clear().then(() => {
+                        $('#reader').empty();
+                        console.log("Scanner stopped dan UI dibersihkan");
+                    }).catch(err => {
+                        console.error("Gagal clear scanner:", err);
+                    });
+                }
+            });
+
+            if ($('#set-select-item').val()) {
+                $('#set-select-item').trigger('change');
+            }
+
+
+            $("#btn-refresh").on('click', function(){
+                localStorage.clear();
+                    setTimeout(function() {
+                    location.reload();
+                }, 500);
             });
 
             $(".filter_category").on("click", function() {
@@ -313,10 +460,10 @@
                 $('.cart_item').each(function() {
                     let productId = $(this).data('id');
                     let productPrice = $(this).data('price');
-                    console.log("lewatt");
                     updateDiscountItem(productId, productPrice);
                     updateSummary();
                 });
+                MemberSavedToLocalStorage();
             });
 
             function updateCartItem(productId, productChange = 0, quantityChange = 0, remove = false) {
@@ -359,7 +506,7 @@
                 }
             }
 
-            function updateDiscountItem(productId, productPrice) {
+            function updateDiscountItem(productId, productPrice, remove = false) {
                 let discountItem = $(`.discount_item[data-id="${productId}"]`);
                 let discountPrice = parseInt(discountItem.data('price'));
                 let discountType = discountItem.data('type');
@@ -367,7 +514,7 @@
                 let cartTotalPrice = parseInt(cartItem.find(".cart_total_price").text().replace("Rp ", "").replace(
                     /\./g, ""));
                 let cartProductQuantity = parseInt(cartItem.find(".cart_product_quantity").text());
-                let afterDiscount = discountItem.find(".after_discount");
+                let afterDiscountQuantity = discountItem.find(".free_discount_quantity");
                 let afterDiscountPrice = discountItem.find(".after_discount_price");
                 let productStock = parseInt($(`.product_item[id="${productId}"]`).find(".product_stock").text());
                 let discountsData = @json($discounts);
@@ -375,7 +522,8 @@
 
                 discountsData.forEach(discount => {
                     const detail = discount.detail_discounts;
-                    let discountInstances = Math.floor(cartProductQuantity / discount.detail_discounts.min_quantity);
+                    let discountInstances = Math.floor(cartProductQuantity / discount.detail_discounts
+                        .min_quantity);
                     let discountCard = `
                                 <div class="row d-flex align-items-center mb-3 discount_item px-0" data-id="${productId}" data-price="${detail.discount_price}" data-type="${discount.type}" id="${discount.id}">
                                 <div class="col-3">
@@ -391,52 +539,89 @@
                                     </div>
                                 <div class="d-flex justify-content-between">
                                         <p class="text-dark fs-6 fw-bold   text-start">${discount.type == "buy_x_get_y" ? detail.free_product.product_name + " - " + detail.free_product.product_code : detail.discount_percentage + "%"}</p>
-                                        <p class="text-dark fs-6 fw-bold  after_discount  text-end">${discount.type == "buy_x_get_y" ? "x" + detail.quantity_free_products : `<span class="after_discount_price">  Rp ${ (parseInt( detail.discount_price ).toLocaleString("id-ID"))} </span>`  }</p>
+                                        <p class="text-dark fs-6 fw-bold  after_discount  text-end">${discount.type == "buy_x_get_y" ? `<span class="free_discount_quantity">x${detail.quantity_free_products}</span>` : `<span class="after_discount_price">  Rp ${ (parseInt( detail.discount_price ).toLocaleString("id-ID"))} </span>`  }</p>
                                     </div>
                                 </div>
                             </div>
                             `;
 
-
+                    if (discount.type === "cheap_redemption") return;
                     if (detail.products_id == productId) {
                         if (productStock > 0) {
                             if (cartProductQuantity >= detail.min_quantity) {
                                 if (cartProductQuantity > detail.min_quantity) {
                                     if (discountType == "percentage_off") {
                                         // percentage_off
-                                        afterDiscountPrice.text("Rp " + (((cartProductQuantity % discount.detail_discounts.min_quantity) * productPrice) + ( discountInstances * discountPrice)).toLocaleString("id-ID"));
+                                        afterDiscountPrice.text("Rp " + (((cartProductQuantity % discount
+                                            .detail_discounts.min_quantity) * productPrice) + (
+                                            discountInstances * discountPrice)).toLocaleString(
+                                            "id-ID"));
                                         updateSummary();
+                                        BillSavedToLocalStorage();
+                                        ProductSavedToLocalStorage();
                                     } else if (discountType == "buy_x_get_y") {
                                         // buy x get y
-                                        let freeDiscountQuantity = discountInstances * discount.detail_discounts.quantity_free_products;
-                                        updateCartItem(productId, +(freeDiscountQuantity - parseInt(afterDiscount.text().replace("x", "").replace(/\./g, ""))));
-                                        afterDiscount.text("x" + freeDiscountQuantity);
-                                        updateSummary();
+                                        let freeDiscountQuantity = discountInstances * discount
+                                            .detail_discounts.quantity_free_products;
+                                        console.log("remove", remove);
+                                        if(remove){
+                                            updateCartItem(productId, -detail.quantity_free_products);
+                                        }else{
+                                            updateCartItem(productId, +(freeDiscountQuantity - parseInt(
+                                            afterDiscountQuantity.text().replace("x", "").replace(/\./g,
+                                                ""))));
+                                        }
 
-                                    } else if ((discountType == "member" || discount.type == "member") &&  selectedMembers) {
+                                        afterDiscountQuantity.text("x" +freeDiscountQuantity);
+                                        updateSummary();
+                                        BillSavedToLocalStorage();
+                                        ProductSavedToLocalStorage();
+
+                                    } else if ((discountType == "member" || discount.type == "member") &&
+                                        selectedMembers) {
                                         if (discountItem.length === 0) {
                                             cartItem.append(discountCard);
                                         }
                                         afterDiscountPrice = cartItem.find(".after_discount_price");
-                                        let test = (((cartProductQuantity % detail.min_quantity) * productPrice) + ( discountInstances *discountPrice));
-                                        afterDiscountPrice.text("Rp " + (((cartProductQuantity % discount.detail_discounts.min_quantity) * productPrice) + (discountInstances * detail.discount_price)).toLocaleString("id-ID"));
+                                        let test = (((cartProductQuantity % detail.min_quantity) *
+                                            productPrice) + (discountInstances * discountPrice));
+                                        afterDiscountPrice.text("Rp " + (((cartProductQuantity % discount
+                                                .detail_discounts.min_quantity) * productPrice) + (
+                                                discountInstances * detail.discount_price))
+                                            .toLocaleString("id-ID"));
                                         updateSummary();
+                                        BillSavedToLocalStorage();
+                                        ProductSavedToLocalStorage();
                                     } else {
                                         cartItem.find(".discount_item").remove();
                                     }
                                 } else {
-                                    if (discountType === "buy_x_get_y") {
+
+                                    if (discount.type === "buy_x_get_y" && remove == false) {
                                         updateCartItem(productId, +detail.quantity_free_products);
                                     }
+
+                                    if (discount.type === "buy_x_get_y" && remove == true) {
+                                        updateCartItem(productId, -detail.quantity_free_products);
+                                    }
+
                                     cartItem.find(".discount_item").remove();
 
-                                    if ((discount.type == "member" && selectedMembers) || discount.type != "member") {
+                                    if ((discount.type == "member" && selectedMembers) || discount.type !=
+                                        "member") {
+                                        console.log("hello");
                                         cartItem.append(discountCard);
                                     }
-                                    let tet = $(`.discount_item[data-id="${productId}"]`);
                                     updateSummary();
+                                    BillSavedToLocalStorage();
+                                    ProductSavedToLocalStorage();
+
                                 }
                             } else {
+                                if (discount.type === "buy_x_get_y" && remove == true) {
+                                        updateCartItem(productId, -detail.quantity_free_products);
+                                    }
+
                                 cartItem.find(".discount_item").remove();
                             }
                         } else {
@@ -450,6 +635,7 @@
 
 
             $('.product_item').on('click', function() {
+                console.log("hasil product di clisk", $(this));
                 let productId = $(this).attr("id");
                 let productName = $(this).find(".product_name").text();
                 let productPrice = $(this).find(".product_price").text().replace("Rp ", "").replace(/\./g,
@@ -466,6 +652,8 @@
                 if (checkCartItem.length > 0) {
                     updateCartItem(productId, +1, +1);
                     updateDiscountItem(productId, productPrice);
+                    BillSavedToLocalStorage();
+                    ProductSavedToLocalStorage();
 
                 } else {
                     let cartItem = `
@@ -505,6 +693,9 @@
                     $('#cart_items').append(cartItem);
                     updateCartItem(productId, +1, +1);
                     updateDiscountItem(productId);
+                    BillSavedToLocalStorage();
+                    ProductSavedToLocalStorage();
+
                 }
 
             });
@@ -516,6 +707,8 @@
                 updateDiscountItem(productId, productPrice);
                 cheapRedemption();
                 updateSummary();
+                BillSavedToLocalStorage();
+                ProductSavedToLocalStorage();
             });
 
             $("#cart_items").on("click", ".remove-item", function() {
@@ -523,9 +716,12 @@
                 let productPrice = $(this).closest(".cart_item").data("price");
 
                 updateCartItem(productId, -1, -1);
-                updateDiscountItem(productId, productPrice);
+                updateDiscountItem(productId, productPrice, true);
                 cheapRedemption();
                 updateSummary();
+                BillSavedToLocalStorage();
+                ProductSavedToLocalStorage();
+
             });
 
             $("#cart_items").on("click", ".delete-item", function() {
@@ -536,6 +732,9 @@
                 updateSummary();
                 updateDiscountItem(productId, productPrice);
                 cheapRedemption();
+                BillSavedToLocalStorage();
+                ProductSavedToLocalStorage();
+
 
             });
 
@@ -549,9 +748,7 @@
                         let isAdded = $(this).hasClass('added');
                         let btn = $(this).find('button');
                         let allText = $(this).find('p');
-                        let totalPrice = parseInt($(".total_price").text().replace("Rp ", "").replace(/\./g,
-                            ""));
-
+                        let totalPrice = parseInt($(".total_price").text().replace("Rp ", "").replace(/\./g, ""));
 
                         $(this).removeClass('border-dark border-gray-400').removeClass(
                             'added inactive active');
@@ -599,19 +796,20 @@
                 let minPrice = card.data('min-price');
                 let discountId = card.data('id');
                 let discountPrice = card.data('discount-price');
-                let freeProductsId = card.data('free-products-id');
-                let quantityFreeProducts = card.data('free-quantity');
-                let detailFreeProduct = card.find('.detail_free_product').text();
+                let productsId = card.data('products-id');
+                let quantityProducts = card.data('quantity');
+                let detailProduct = card.find('.detail_product').text();
 
                 if (card.hasClass('added')) {
                     card.removeClass('added');
                     $(`#selected_cheap_redemptions .selected_cheap_redemption[data-id="${discountId}"]`)
                         .remove();
-                    updateCartItem(freeProductsId, -quantityFreeProducts);
+                    updateCartItem(productsId, -quantityProducts);
+
                 } else {
                     card.addClass('added');
                     let selectedCheapRedemptionItem = (`
-                     <div class="mb-3 p-3 border border-dark rounded selected_cheap_redemption"  style="min-width: 100%;"  data-id="${discountId}" data-min-price="${minPrice}" data-discount-price="${discountPrice}" data-free-products-id="${freeProductsId}" data-free-quantity="${quantityFreeProducts}">
+                     <div class="mb-3 p-3 border border-dark rounded selected_cheap_redemption"  style="min-width: 100%;"  data-id="${discountId}" data-min-price="${minPrice}" data-discount-price="${discountPrice}" data-products-id="${productsId}" data-quantity="${quantityProducts}">
                         <div class="d-flex justify-content-between">
                         <p class="fs-6 text-dark mb-0 text-m text-bold">${discountName}</p>
                         <button type="button" class="btn bg-danger mb-2 px-2 py-1 text-white">Cancel</button>
@@ -621,8 +819,8 @@
                             <p class="fs-6 text-dark mb-0 ">${ parseInt(minPrice).toLocaleString("id-ID")}</p>
                         </div>
                         <div class="d-flex justify-content-between">
-                            <p class="fs-6 text-dark mb-0 ">${detailFreeProduct}</p>
-                            <p class="fs-6 text-dark mb-0 ">x${quantityFreeProducts}</p>
+                            <p class="fs-6 text-dark mb-0 ">${detailProduct}</p>
+                            <p class="fs-6 text-dark mb-0 ">x${quantityProducts}</p>
                         </div>
                         <div class="d-flex justify-content-between">
                             <p class="fs-6 text-dark mb-0 "></p>
@@ -631,27 +829,34 @@
                     </div>
                 `);
                     $('#selected_cheap_redemptions').append(selectedCheapRedemptionItem);
-                    console.log("iddd", freeProductsId);
-                    updateCartItem(freeProductsId, +quantityFreeProducts);
+                    console.log("iddd", productsId);
+                    updateCartItem(productsId, +quantityProducts);
 
                 }
                 cheapRedemption();
                 updateSummary();
+                BillSavedToLocalStorage();
+                ProductSavedToLocalStorage();
             });
 
             $('#selected_cheap_redemptions').on('click', '.btn.bg-danger', function() {
                 const selectedCheapRedemption = $(this).closest('.selected_cheap_redemption');
                 const discountId = selectedCheapRedemption.data('id');
-                const freeProductsId = selectedCheapRedemption.data('free-products-id');
-                const quantityFreeProducts = selectedCheapRedemption.data('free-quantity');
+                const productsId = selectedCheapRedemption.data('products-id');
+                const quantityProducts = selectedCheapRedemption.data('quantity');
                 selectedCheapRedemption.remove();
 
                 $(`.cheap_redemption_item[data-id="${discountId}"]`).removeClass('added');
 
                 cheapRedemption();
-                updateCartItem(freeProductsId, -quantityFreeProducts);
+                updateCartItem(productsId, -quantityProducts);
                 updateSummary();
+                BillSavedToLocalStorage();
+                ProductSavedToLocalStorage();
             });
+
+
+
 
 
             $(".btn_place_order").on("click", function() {
@@ -662,12 +867,12 @@
                     let minPrice = $(this).data('min-price');
                     let discountId = $(this).data('id');
                     let discountPrice = $(this).data('discount-price');
-                    let freeProductsId = $(this).data('free-products-id');
-                    let quantityFreeProducts = $(this).data('free-quantity');
+                    let productsId = $(this).data('products-id');
+                    let quantityProducts = $(this).data('quantity');
 
                     let item = {
-                        product_id: freeProductsId,
-                        quantity: quantityFreeProducts,
+                        product_id: productsId,
+                        quantity: quantityProducts,
                         total_price: discountPrice,
                         discounts_id: discountId,
                     }
@@ -677,21 +882,27 @@
                 $(".cart_item").each(function() {
                     let total_price = parseInt($(this).find(".cart_total_price").text().replace(
                         "Rp ", "").replace(/\./g, ""));
+                    let quantity =  parseInt($(this).find(".cart_product_quantity").text());
 
                     let discountItem = $(this).find(".discount_item");
 
                     if (discountItem.length > 0) {
-                        let afterDiscount = discountItem.find(".after_discount_price").text()
-                            .replace("Rp ", "").replace(/\./g, "");
+                        let afterDiscount = discountItem.find(".after_discount_price").text().replace("Rp ", "").replace(/\./g, "");
+                        let afterDiscountQuantity = discountItem.find(".free_discount_quantity").text().replace("x", "").replace(/\./g, "");
                         if (!isNaN(afterDiscount) && afterDiscount !== "") {
                             total_price = parseInt(afterDiscount);
+                        }
+                        if (!isNaN(afterDiscountQuantity) && afterDiscountQuantity !== "") {
+                        console.log(afterDiscountQuantity);
+                            quantity += parseInt(afterDiscountQuantity);
+                            console.log("qty", quantity)
                         }
                     }
 
                     let item = {
                         product_id: $(this).data("id"),
                         product_name: $(this).find(".cart_product_name").text(),
-                        quantity: parseInt($(this).find(".cart_product_quantity").text()),
+                        quantity: quantity,
                         total_price: total_price,
                         discounts_id: discountItem.attr("id") ?? null,
                     };
@@ -724,8 +935,62 @@
                     contentType: "application/json",
                     data: JSON.stringify(bills),
                     success: function(response) {
-                        alert("success");
-                        console.log(response);
+                        localStorage.clear();
+                        // alert("success");
+                        const bill = response.data.bill;
+                        const detail_bill = response.data.detail_bill;
+                        const date = new Date(bill.created_at);
+                        const formattedDate = date.toLocaleDateString('en-US');
+
+
+                        console.log(response.data);
+
+
+                        $(".modal-body .mb-3").html(`
+                             <h6 class="mb-0 branch_name">${bill.branch.branch_name}</h6>
+                             <small class="branch_code">${bill.branch.address}</small>
+                        `);
+                        $(".modal-body .mb-2").html(`
+                            <strong>ID Bill:</strong> ${bill.id} <br>
+                            <strong>ID Member:</strong> ${bill.member? bill.member.member_name : "-"} <br>
+                            <strong>Branch Code:</strong> ${bill.branch.branch_code} <br>
+                            <strong>Cashier:</strong> ${bill.users.user_name} <br>
+                            <strong>Date:</strong> ${formattedDate}
+                        `);
+
+                        const listHtml = detail_bill.map(item => `
+                            <li class="list-group-item">
+                                 <div class=" d-flex justify-content-between">
+                                    <span>${item.product.product_name}</span>
+                                    <span>Rp ${(parseInt(item.total_price)).toLocaleString("id-ID")}</span>
+                                </div>
+                              ${item.discount ? `
+                                <div class="d-flex justify-content-between">
+                                    <span>${item.discount.discount_name}</span>
+                                    <span>${item.discount.type}</span>
+                                </div>` : ''}
+                            </li>
+                        `).join('');
+                        $(".modal-body .list-group").html(listHtml);
+
+                        const summary = `
+                        <div class="d-flex justify-content-between">
+                            <span>Total Item:</span>
+                            <span>Rp ${(parseInt(bill.total_price)).toLocaleString("id-ID")}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>PPN (10%):</span>
+                            <span>Rp ${(parseInt(bill.tax)).toLocaleString("id-ID")}</span>
+                        </div>
+                        <div class="d-flex justify-content-between fw-bold">
+                            <span>Grand Total:</span>
+                            <span>Rp ${(parseInt(bill.grand_total)).toLocaleString("id-ID")}</span>
+                        </div>
+                        `;
+                        $(".modal-body .payment-summary").html(summary);
+
+
+                        $("#receiptModal").modal("show");
                     },
                     error: function(xhr) {
                         alert(xhr.responseText, "erorr");

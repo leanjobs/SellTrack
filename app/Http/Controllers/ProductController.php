@@ -4,23 +4,54 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $userBranchId = Auth::user()->branches_id;
+        try{
+            $userBranchId = Auth::user()->branches_id;
+            $search = $request->input('search');
+            if($search){
+                $products = Product::with(['product_category', 'incoming_stocks' => function ($query) use ($userBranchId){
+                    $query->where('branches_id', $userBranchId)->whereDate("expired", ">=", today());
+                }])->where('product_name', 'like', '%' .$search. '%' )->latest()->get();
+            }else{
+                $products = Product::with(['product_category', 'incoming_stocks' => function ($query) use ($userBranchId){
+                    $query->where('branches_id', $userBranchId)->whereDate("expired", ">=", today());
+                }])->latest()->get();
+            }
 
-        $products = Product::with(['product_category', 'incoming_stocks' => function ($query) use ($userBranchId){
-            $query->where('branches_id', $userBranchId)->whereDate("expired", ">=", today());
-        }])->latest()->get();
-        return view('products.products', compact('products'));
+            $closeExpired = collect($products)
+            ->flatMap(fn($product) => $product->incoming_stocks)
+            ->filter(function ($incoming_stock) {
+                $daysLeft = Carbon::now()->diffInDays(Carbon::parse($incoming_stock->expired), false);
+                return $daysLeft >= 0 && $daysLeft <= 5;
+            })
+            ->sortBy('expired');
+
+            $runningLow = collect($products)
+            ->flatMap(fn($product) => $product->incoming_stocks)
+            ->filter(function ($incoming_stock) {
+                return $incoming_stock->current_stocks <= 10;
+            })
+            ->sortBy('current_stocks');
+            Log::info($runningLow);
+
+
+            return view('products.products', compact(['products', 'closeExpired', 'runningLow']));
+
+        }catch(Exception $e){
+            Log::error($e->getMessage());
+        }
     }
 
     /**
