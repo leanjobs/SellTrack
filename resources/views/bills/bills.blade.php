@@ -27,14 +27,24 @@
                             <thead>
                                 <tr>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">ID</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Total Price</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Tax</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Grand Total</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Member's Phone</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Cashier</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Payment</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Date</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Action</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Total Price</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Tax
+                                    </th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Grand Total</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Member's Phone</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Cashier</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Payment</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Status</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Date</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Action</th>
 
                                 </tr>
                             </thead>
@@ -45,29 +55,45 @@
                                             <span class="text-secondary text-xs font-weight-bold">{{ $bill->id }}</span>
                                         </td>
                                         <td class="align-middle ">
-                                            <span class="text-secondary text-xs font-weight-bold">Rp {{ number_format($bill->total_price) }}</span>
+                                            <span class="text-secondary text-xs font-weight-bold">Rp
+                                                {{ number_format($bill->total_price) }}</span>
                                         </td>
                                         <td class="align-middle ">
-                                            <span class="text-secondary text-xs font-weight-bold">Rp {{ number_format($bill->tax) }}</span>
+                                            <span class="text-secondary text-xs font-weight-bold">Rp
+                                                {{ number_format($bill->tax) }}</span>
                                         </td>
                                         <td class="align-middle ">
-                                            <span class="text-secondary text-xs font-weight-bold">Rp {{ number_format($bill->grand_total) }}</span>
+                                            <span class="text-secondary text-xs font-weight-bold">Rp
+                                                {{ number_format($bill->grand_total) }}</span>
                                         </td>
                                         <td class="align-middle ">
-                                            <span class="text-secondary text-xs font-weight-bold">{{ $bill->member ? $bill->member->phone_number : "-" }}</span>
+                                            <span
+                                                class="text-secondary text-xs font-weight-bold">{{ $bill->member ? $bill->member->phone_number : '-' }}</span>
                                         </td>
                                         <td class="align-middle ">
-                                            <span class="text-secondary text-xs font-weight-bold">{{ $bill->users->user_name }}</span>
+                                            <span
+                                                class="text-secondary text-xs font-weight-bold">{{ $bill->users->user_name }}</span>
                                         </td>
                                         <td class="align-middle ">
-                                            <span class="text-secondary text-xs font-weight-bold">{{ $bill->payment->payment_type }}</span>
+                                            <span
+                                                class="text-secondary text-xs font-weight-bold">{{ $bill->payment->payment_type }}</span>
                                         </td>
                                         <td class="align-middle ">
-                                            <span class="text-secondary text-xs font-weight-bold">{{ $bill->created_at }}</span>
+                                            <span
+                                                class="text-secondary text-xs font-weight-bold">{{ $bill->payment->status }}</span>
+                                        </td>
+                                        <td class="align-middle ">
+                                            <span
+                                                class="text-secondary text-xs font-weight-bold">{{ $bill->created_at }}</span>
                                         </td>
                                         <td class="align-middle">
-                                          <button type="submit" class="btn bg-gradient-dark btn-receipt" data-id="{{ $bill->id }}">
-                                               Receipt
+                                            <button type="submit" class="btn bg-gradient-dark btn-receipt"
+                                                data-id="{{ $bill->id }}">
+                                                Receipt
+                                            </button>
+                                            <button type="button" class="btn bg-gradient-dark pay-now"
+                                                data-snap="{{ $bill->payment->snap_token }}">
+                                                bayar
                                             </button>
                                             @include('components.modal-receipt')
                                         </td>
@@ -81,30 +107,62 @@
             </div>
         </div>
     </div>
-</div>
-<script>
-    $(document).ready(function() {
-        $('.btn-receipt').on('click', function(){
-            let billId = $(this).data('id');
+    </div>
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}">
+    </script>
 
-            $.ajax({
-                url: "/bills/"+billId,
-                type: "GET",
-                headers: {
+    <script>
+        $(document).ready(function() {
+            $('.pay-now').on('click', function() {
+                const snapToken = $(this).data("snap");
+                snap.pay(snapToken, {
+                    onSuccess: function(result) {
+                        $.ajax({
+                            url: '/api/handle-midtrans',
+                            method: 'POST',
+                            data: {
+                                _token: '{{ csrf_token() }}',
+                                order_id: result.order_id,
+                                transaction_status: result.transaction_status,
+                            },
+                            success: function(responseHandle) {
+                                // Refresh data atau tampilkan struk
+                            },
+                            error: function(xhr) {
+                                alert("Gagal update data pembayaran.");
+                            }
+                        });
+                    },
+                    onPending: function(result) {
+                        console.log("Masih pending", result);
+                    },
+                    onError: function(result) {
+                        alert("Pembayaran gagal");
+                    }
+                });
+            });
+
+            $('.btn-receipt').on('click', function() {
+                let billId = $(this).data('id');
+
+                $.ajax({
+                    url: "/bills/" + billId,
+                    type: "GET",
+                    headers: {
                         "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
                     },
-                contentType: "application/json",
-                success: function(response){
-                    const bill = response.data.bill;
-                    const detail_bill = response.data.detail_bill;
-                    const date = new Date(bill.created_at);
-                    const formattedDate = date.toLocaleDateString('en-US');
+                    contentType: "application/json",
+                    success: function(response) {
+                        const bill = response.data.bill;
+                        const detail_bill = response.data.detail_bill;
+                        const date = new Date(bill.created_at);
+                        const formattedDate = date.toLocaleDateString('en-US');
 
-                    $(".modal-body .mb-3").html(`
+                        $(".modal-body .mb-3").html(`
                             <h6 class="mb-0 branch_name">${bill.branch.branch_name}</h6>
                             <small class="branch_code">${bill.branch.address}</small>
                     `);
-                    $(".modal-body .mb-2").html(`
+                        $(".modal-body .mb-2").html(`
                         <strong>ID Bill:</strong> ${bill.id} <br>
                         <strong>ID Member:</strong> ${bill.member? bill.member.member_name : "-"} <br>
                         <strong>Branch Code:</strong> ${bill.branch.branch_code} <br>
@@ -112,22 +170,22 @@
                         <strong>Date:</strong> ${formattedDate}
                     `);
 
-                    const listHtml = detail_bill.map(item => `
+                        const listHtml = detail_bill.map(item => `
                         <li class="list-group-item">
                                 <div class=" d-flex justify-content-between">
                                 <span>${item.product.product_name}</span>
                                 <span>Rp ${(parseInt(item.total_price)).toLocaleString("id-ID")}</span>
                             </div>
                             ${item.discount ? `
-                            <div class="d-flex justify-content-between">
-                                <span>${item.discount.discount_name}</span>
-                                <span>${item.discount.type}</span>
-                            </div>` : ''}
+                                <div class="d-flex justify-content-between">
+                                    <span>${item.discount.discount_name}</span>
+                                    <span>${item.discount.type}</span>
+                                </div>` : ''}
                         </li>
                     `).join('');
-                    $(".modal-body .list-group").html(listHtml);
+                        $(".modal-body .list-group").html(listHtml);
 
-                    const summary = `
+                        const summary = `
                         <div class="d-flex justify-content-between">
                             <span>Total Item:</span>
                             <span>Rp ${(parseInt(bill.total_price)).toLocaleString("id-ID")}</span>
@@ -143,20 +201,20 @@
                         `;
                         $(".modal-body .payment-summary").html(summary);
 
-                    $(".modal-footer .close-btn").html(`
+                        $(".modal-footer .close-btn").html(`
                          <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
                     `);
 
 
-                    $("#receiptModal").modal("show");
-                },
-                error: function(xhr){
-                    alert(xhr.responeText);
-                    console.log(xhr);
-                }
+                        $("#receiptModal").modal("show");
+                    },
+                    error: function(xhr) {
+                        alert(xhr.responeText);
+                        console.log(xhr);
+                    }
+                });
             });
-        });
 
-    });
-</script>
+        });
+    </script>
 @endsection

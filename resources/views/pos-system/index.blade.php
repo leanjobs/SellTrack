@@ -228,10 +228,10 @@
                         <i class="material-symbols-rounded fs-2 text-white d-flex align-items-center border border-dark rounded p-1 border-2 p-2  bg-dark "
                             data-method="cash">payments</i>
                     </button>
-                    {{-- <button class="btn border-0 p-1 mx-3 payment_method">
+                    <button class="btn border-0 p-1 mx-3 payment_method">
                         <i class="material-symbols-rounded fs-2 text-dark d-flex align-items-center border border-dark rounded p-1 border-2 p-2 "
                             data-method="qr">qr_code_scanner</i>
-                    </button> --}}
+                    </button>
                 </div>
                 <div class="mb-3 d-flex justify-content-center">
                     @include('components.modal-receipt')
@@ -241,6 +241,7 @@
             </div>
         </div>
     </div>
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{  env('MIDTRANS_CLIENT_KEY') }}"></script>
     <script>
         $(document).ready(function() {
             function BillSavedToLocalStorage() {
@@ -324,8 +325,6 @@
                     $('#category-section').addClass('d-none');
                     $('#products_list').addClass('d-none');
                     $('#scan-section').removeClass('d-none');
-                    // $('#scan-result').removeClass('d-none');
-                    // $('#scan-result').addClass('d-flex justify-content-between');
 
                     if ($('#reader').is(':empty')) {
                         console.log("teste")
@@ -935,62 +934,35 @@
                     contentType: "application/json",
                     data: JSON.stringify(bills),
                     success: function(response) {
-                        localStorage.clear();
-                        // alert("success");
-                        const bill = response.data.bill;
-                        const detail_bill = response.data.detail_bill;
-                        const date = new Date(bill.created_at);
-                        const formattedDate = date.toLocaleDateString('en-US');
-
-
-                        console.log(response.data);
-
-
-                        $(".modal-body .mb-3").html(`
-                             <h6 class="mb-0 branch_name">${bill.branch.branch_name}</h6>
-                             <small class="branch_code">${bill.branch.address}</small>
-                        `);
-                        $(".modal-body .mb-2").html(`
-                            <strong>ID Bill:</strong> ${bill.id} <br>
-                            <strong>ID Member:</strong> ${bill.member? bill.member.member_name : "-"} <br>
-                            <strong>Branch Code:</strong> ${bill.branch.branch_code} <br>
-                            <strong>Cashier:</strong> ${bill.users.user_name} <br>
-                            <strong>Date:</strong> ${formattedDate}
-                        `);
-
-                        const listHtml = detail_bill.map(item => `
-                            <li class="list-group-item">
-                                 <div class=" d-flex justify-content-between">
-                                    <span>${item.product.product_name}</span>
-                                    <span>Rp ${(parseInt(item.total_price)).toLocaleString("id-ID")}</span>
-                                </div>
-                              ${item.discount ? `
-                                <div class="d-flex justify-content-between">
-                                    <span>${item.discount.discount_name}</span>
-                                    <span>${item.discount.type}</span>
-                                </div>` : ''}
-                            </li>
-                        `).join('');
-                        $(".modal-body .list-group").html(listHtml);
-
-                        const summary = `
-                        <div class="d-flex justify-content-between">
-                            <span>Total Item:</span>
-                            <span>Rp ${(parseInt(bill.total_price)).toLocaleString("id-ID")}</span>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <span>PPN (10%):</span>
-                            <span>Rp ${(parseInt(bill.tax)).toLocaleString("id-ID")}</span>
-                        </div>
-                        <div class="d-flex justify-content-between fw-bold">
-                            <span>Grand Total:</span>
-                            <span>Rp ${(parseInt(bill.grand_total)).toLocaleString("id-ID")}</span>
-                        </div>
-                        `;
-                        $(".modal-body .payment-summary").html(summary);
-
-
-                        $("#receiptModal").modal("show");
+                        let snapToken = response.data.payment.snap_token;
+                        if(response.data.payment.payment_type == "cash"){
+                            showBill(response);
+                        }else if( response.data.payment.payment_type == "qr"){
+                            snap.pay(snapToken, {
+                            onSuccess: function(result) {
+                            //     $.ajax({
+                            //     url: '/api/handle-midtrans',
+                            //     method: 'POST',
+                            //     data: {
+                            //         _token: '{{ csrf_token() }}',
+                            //         order_id: result.order_id,
+                            //         transaction_status: result.transaction_status,
+                            //     },
+                            //     success: function(responseHandle) {
+                            //         showBill(response);
+                            //     },
+                            //     error: function(xhr) {
+                            //         alert("Gagal update data pembayaran.");
+                            //     }
+                            // });
+                            showBill(response)
+                            },
+                            onPending: function(result) {
+                            },
+                            onError: function(result) {
+                            }
+                        });
+                        }
                     },
                     error: function(xhr) {
                         alert(xhr.responseText, "erorr");
@@ -998,6 +970,64 @@
                     }
                 });
             });
+
+            function showBill(response){
+                localStorage.clear();
+                const bill = response.data.bill;
+                const detail_bill = response.data.detail_bill;
+                const date = new Date(bill.created_at);
+                const formattedDate = date.toLocaleDateString('en-US');
+
+
+                console.log(response.data);
+
+
+                $(".modal-body .mb-3").html(`
+                        <h6 class="mb-0 branch_name">${bill.branch.branch_name}</h6>
+                        <small class="branch_code">${bill.branch.address}</small>
+                `);
+                $(".modal-body .mb-2").html(`
+                    <strong>ID Bill:</strong> ${bill.id} <br>
+                    <strong>ID Member:</strong> ${bill.member? bill.member.member_name : "-"} <br>
+                    <strong>Branch Code:</strong> ${bill.branch.branch_code} <br>
+                    <strong>Cashier:</strong> ${bill.users.user_name} <br>
+                    <strong>Date:</strong> ${formattedDate}
+                `);
+
+                const listHtml = detail_bill.map(item => `
+                    <li class="list-group-item">
+                            <div class=" d-flex justify-content-between">
+                            <span>${item.product.product_name}</span>
+                            <span>Rp ${(parseInt(item.total_price)).toLocaleString("id-ID")}</span>
+                        </div>
+                        ${item.discount ? `
+                        <div class="d-flex justify-content-between">
+                            <span>${item.discount.discount_name}</span>
+                            <span>${item.discount.type}</span>
+                        </div>` : ''}
+                    </li>
+                `).join('');
+                $(".modal-body .list-group").html(listHtml);
+
+                const summary = `
+                <div class="d-flex justify-content-between">
+                    <span>Total Item:</span>
+                    <span>Rp ${(parseInt(bill.total_price)).toLocaleString("id-ID")}</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span>PPN (10%):</span>
+                    <span>Rp ${(parseInt(bill.tax)).toLocaleString("id-ID")}</span>
+                </div>
+                <div class="d-flex justify-content-between fw-bold">
+                    <span>Grand Total:</span>
+                    <span>Rp ${(parseInt(bill.grand_total)).toLocaleString("id-ID")}</span>
+                </div>
+                `;
+                $(".modal-body .payment-summary").html(summary);
+
+
+                $("#receiptModal").modal("show");
+            }
 
         });
     </script>

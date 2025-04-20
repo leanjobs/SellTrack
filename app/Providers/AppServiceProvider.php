@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\ServiceProvider;
+use Midtrans\Config as MidtransConfig;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,6 +25,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        MidtransConfig::$serverKey = config('midtrans.ServerKey');
+        MidtransConfig::$isProduction = config('midtrans.isProduction');
+        MidtransConfig::$isSanitized = config('midtrans.isSanitized');
+        MidtransConfig::$is3ds = config('midtrans.is3ds');
     }
 }

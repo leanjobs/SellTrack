@@ -84,7 +84,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="mb-3" id="free_product_detail" style="display: none">
+                            <div class="mb-3" id="product_detail" style="display: none">
                                 <p class="text-md text-bold mb-0">Product Details</p>
                                 <div class="row">
                                     <div class="col-md-6">
@@ -193,11 +193,17 @@
                             @endif
                             <div class="mb-3">
                                 <label class="form-label">Start Date</label>
-                                <input type="date" name="start_date" class="form-control border p-2" required value="{{ old('start_date',  $discount->start_date) }}">
+                                <input type="date" name="start_date" class="form-control border p-2" required value="{{ old('start_date', isset($discount) ? $discount->start_date : '') }}">
+                                @error('start_date')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">End Date</label>
-                                <input type="date" name="end_date" class="form-control border p-2" required value="{{ old('end_date', $discount->end_date)}}">
+                                <input type="date" name="end_date" class="form-control border p-2" required value="{{ old('end_date', isset($discount) ? $discount->end_date : '') }}">
+                                @error('end_date')
+                                <div class="text-danger">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -207,7 +213,7 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Product Discount</label>
-                                <select name="free_products_id" id="free_products_id"
+                                <select name="products_id" id="products_id"
                                     class="form-select select2 bg-transparent border p-2"
                                     aria-label="Default select example">
                                     <option value="" selected disabled>Select and search</option>
@@ -215,32 +221,32 @@
                                         <option value="{{ $product->id }}" data-name="{{ $product->product_name }}"
                                             data-code="{{ $product->product_code }}"
                                             data-stocks="{{ $product->incoming_stocks->sum('current_stocks') ?? 0 }}"
-                                            data-price="{{ $product->price }}" {{ $product->id == ($discount->detail_discounts->free_products_id ?? '') ? 'selected' : '' }}>{{ $product->product_name }} -
+                                            data-price="{{ $product->price }}" {{ $product->id == ($discount->detail_discounts->products_id ?? '') ? 'selected' : '' }}>{{ $product->product_name }} -
                                             {{ $product->product_code }}</option>
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="mb-3" id="free_product_detail" style="display: none">
+                            <div class="mb-3" id="product_detail" style="display: none">
                                 <p class="text-md text-bold mb-0">Product Details</p>
                                 <div class="row">
                                     <div class="col-md-6">
                                         <p class="text-sm mb-0"><span class="text-bold">Name :</span> <span
-                                                id="free_product_name"></span></p>
+                                                id="product_name"></span></p>
                                         <p class="text-sm mb-0"><span class="text-bold">Code :</span> <span
-                                                id="free_product_code"></span></p>
+                                                id="product_code"></span></p>
                                     </div>
                                     <div class="col-md-6">
                                         <p class="text-sm  mb-0"><span class="text-bold">Stock :</span> <span
-                                                id="free_product_stocks"></span></p>
+                                                id="product_stocks"></span></p>
                                         <p class="text-sm  mb-0"><span class="text-bold">Price :</span> <span
-                                                id="free_product_price"></span></p>
+                                                id="product_price"></span></p>
                                     </div>
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Quantity Free Prodcut</label>
-                                <input type="number" name="quantity_free_products" id="quantity_free_products"
-                                    class="form-control border p-2" required disabled value="{{ old('quantity_free_products', $discount->detail_discounts->quantity_free_products)}}">
+                                <input type="number" name="min_quantity" id="min_quantity"
+                                    class="form-control border p-2" required disabled value="{{ old('min_quantity', $discount->detail_discounts->min_quantity)}}">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Discount Price</label>

@@ -173,6 +173,7 @@ class DiscountController extends Controller
             return redirect()->route('discounts.index')->with('success', 'Discount created successfully');
         } catch (Exception $e) {
             Log::info($e->getMessage());
+            return redirect()->back()->with('error', $e->getMessage());
         }
     }
 
@@ -209,24 +210,24 @@ class DiscountController extends Controller
      */
     public function update(Request $request, Discount $discount)
     {
+        $validated = $request->validate([
+            'discount_name' => 'sometimes|required|string',
+            'type' => 'sometimes|required|in:cheap_redemption,percentage_off,buy_x_get_y,member',
+            'branches_id' => 'sometimes|nullable|exists:branches,id',
+            'all_branches' => 'sometimes|boolean',
+            'start_date' => 'sometimes|required|date|after_or_equal:today',
+            'end_date' => 'sometimes|required|date|after_or_equal:start_date',
+            'status' => 'sometimes|required|in:active,inactive',
+            'products_id' => 'sometimes|nullable|exists:products,id',
+            'min_quantity' => 'sometimes|nullable|integer',
+            'discount_price' => 'sometimes|nullable|numeric',
+            'discount_percentage' => 'sometimes|nullable|integer',
+            'free_products_id' => 'sometimes|nullable|exists:products,id',
+            'quantity_free_products' => 'sometimes|nullable|integer',
+            'min_total_price' => 'sometimes|nullable|numeric'
+        ]);
         try {
             Log::info('requestt', $request->all());
-            $validated = $request->validate([
-                'discount_name' => 'sometimes|required|string',
-                'type' => 'sometimes|required|in:cheap_redemption,percentage_off,buy_x_get_y,member',
-                'branches_id' => 'sometimes|nullable|exists:branches,id',
-                'all_branches' => 'sometimes|boolean',
-                'start_date' => 'sometimes|required|date|after_or_equal:today',
-                'end_date' => 'sometimes|required|date|after_or_equal:start_date',
-                'status' => 'sometimes|required|in:active,inactive',
-                'products_id' => 'sometimes|nullable|exists:products,id',
-                'min_quantity' => 'sometimes|nullable|integer',
-                'discount_price' => 'sometimes|nullable|numeric',
-                'discount_percentage' => 'sometimes|nullable|integer',
-                'free_products_id' => 'sometimes|nullable|exists:products,id',
-                'quantity_free_products' => 'sometimes|nullable|integer',
-                'min_total_price' => 'sometimes|nullable|numeric'
-            ]);
             Log::info('validated', $validated);
 
             $detail_discount = $discount->detailDiscount;
@@ -259,6 +260,7 @@ class DiscountController extends Controller
             return redirect()->route('discounts.index')->with('success', 'Discount created successfully');
         } catch (Exception $e) {
             Log::info($e->getMessage());
+            return redirect()->back()->withInput()->with('error', $e->getMessage());
         }
     }
 

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->enum('payment_type', ['cash', 'qr']);
             $table->string('order_id')->nullable();
+            $table->string('snap_token')->nullable();
             $table->enum('status', ['succeed', 'waiting', 'failed']);
             $table->softDeletes();
             $table->timestamps();

@@ -12,6 +12,8 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+
 
 class BillController extends Controller
 {
@@ -40,31 +42,27 @@ class BillController extends Controller
      */
     public function store(Request $request)
     {
+        $validated = $request->validate([
+            "members_id" => 'nullable|exists:members,id',
+            "payment_method" => 'required|in:cash,qr',
+            "tax" => "required|numeric",
+            "total_price" => "required|numeric",
+            "grand_total" => "required|numeric",
+            "items" => "required|array",
+            "items.*.product_id" => "required|exists:products,id",
+            "items.*.discounts_id" => "nullable|exists:discounts,id",
+            "items.*.quantity" => "required|numeric",
+            "items.*.total_price" => "required|numeric",
+        ]);
+        $validated['users_id'] = Auth::user()->id;
+        $validated['branches_id'] = Auth::user()->branches_id;
+
         try {
             $userBranchId = Auth::user()->branches_id;
             $detail_bills = [];
-            Log::info("request bills", $request->all());
-
-
-
-            $validated = $request->validate([
-                "members_id" => 'nullable|exists:members,id',
-                "payment_method" => 'required|in:cash,qr',
-                "tax" => "required|numeric",
-                "total_price" => "required|numeric",
-                "grand_total" => "required|numeric",
-                "items" => "required|array",
-                "items.*.product_id" => "required|exists:products,id",
-                "items.*.discounts_id" => "nullable|exists:discounts,id" ,
-                "items.*.quantity" => "required|numeric",
-                "items.*.total_price" => "required|numeric",
-            ]);
-            $validated['users_id'] = Auth::user()->id;
-            $validated['branches_id'] = Auth::user()->branches_id;
 
             $payment = Payment::create([
                 "payment_type" => $validated['payment_method'],
-                // "order_id" => $validated['order_id']
                 "status" => $validated['payment_method'] === "cash" ? "succeed" : "waiting",
             ]);
 
@@ -91,7 +89,6 @@ class BillController extends Controller
                 ]);
                 $detail_bill->load(['product', 'discount']);
                 $detail_bills[] = $detail_bill;
-                Log::info($detail_bill);
                 $incoming_stocks = IncomingStock::where("products_id", $item['product_id'])->where('branches_id', $userBranchId)->where("current_stocks", '>', 0)->whereDate("expired", ">=", today())->orderBy("expired", 'asc')->get();
 
                 $quantityToDeduct = $item['quantity'];
@@ -111,16 +108,41 @@ class BillController extends Controller
                 }
             }
 
+            $orderId = 'ORD-' . Str::uuid();
             $data = [
                 'bill' => $bill,
-                'detail_bill' => $detail_bills
+                'detail_bill' => $detail_bills,
+                'payment' => $payment,
+
             ];
-            Log::info($data);
-            // return redirect()->back()->with('success', 'successfully');
-            return response()->json(['message' => 'successfully','data' => $data]);
+
+            if ($payment->payment_type == "qr") {
+                // Set your Merchant Server Key
+                \Midtrans\Config::$serverKey = config('midtrans.ServerKey');
+                // Set to Development/Sandbox Environment (default). Set to true for Production Environment (accept real transaction).
+                \Midtrans\Config::$isProduction = config('midtrans.isProduction');
+                // Set sanitization on (default)
+                \Midtrans\Config::$isSanitized = config('midtrans.isSanitized');
+                // Set 3DS transaction for credit card to true
+                \Midtrans\Config::$is3ds = config('midtrans.is3ds');
+
+                $params = array(
+                    'transaction_details' => array(
+                        'order_id' => $orderId,
+                        'gross_amount' => $bill->grand_total,
+                    ),
+                );
+
+                $snapToken = \Midtrans\Snap::getSnapToken($params);
+                $payment->order_id = $orderId;
+                $payment->snap_token = $snapToken;
+                $payment->save();
+            }
+
+            return response()->json(['message' => 'successfully', 'data' => $data]);
         } catch (Exception $e) {
-            Log::info( $e->getMessage());
-            return redirect()->back()->with('error', 'error');
+            Log::info($e->getMessage());
+            return redirect()->back()->withInput()->with('error', $e->getMessage());
         }
     }
 
@@ -129,21 +151,20 @@ class BillController extends Controller
      */
     public function show(Bill $bill)
     {
-        try{
+        try {
             $bill->load(['member', 'branch', 'users']);
             $detail_bills = DetailBill::where('bills_id', $bill->id)->latest()->get();
-            foreach($detail_bills as $detail_bill){
+            foreach ($detail_bills as $detail_bill) {
                 $detail_bill->load(['product', 'discount']);
             }
             $data = [
                 'bill' => $bill,
                 'detail_bill' => $detail_bills
             ];
-            return response()->json(['message' => 'successfully','data' => $data]);
-        }catch(Exception $e){
-            Log::info( $e->getMessage());
+            return response()->json(['message' => 'successfully', 'data' => $data]);
+        } catch (Exception $e) {
+            Log::info($e->getMessage());
             return redirect()->back()->with('error', $e->getMessage());
-
         }
     }
 
