@@ -1,11 +1,11 @@
 <?php
 
-use App\Http\Controllers\AnalysisController;
 use App\Http\Controllers\ApiLocation;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BillController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DiscountController;
 use App\Http\Controllers\IncomingStockController;
 use App\Http\Controllers\MemberController;
@@ -34,8 +34,8 @@ Route::group(['middleware' => ['auth', 'RoleCheck:super_admin,admin,staff']], fu
 
 
     Route::get('/pos-system',[ PosController::class, 'index'] );
-    // Route::get('/analysis',[ AnalysisController::class, 'index'] );
-    Route::get('/dashboard',[ AnalysisController::class, 'index'] );
+    Route::get('/dashboard',[ DashboardController::class, 'index'] );
+
 
     Route::get('/filter-products',[ PosController::class, 'filterProducts'])->name('filter.products');
 
@@ -44,6 +44,9 @@ Route::group(['middleware' => ['auth', 'RoleCheck:super_admin,admin,staff']], fu
 
 Route::group(['middleware' => ['auth', 'RoleCheck:super_admin,admin']], function(){
     Route::resource('/discounts', DiscountController::class);
+    Route::get('/dashboard-print',[ DashboardController::class, 'print'])->name('print.dashboard');
+    Route::get('/bills-print',[ BillController::class, 'print'])->name('print.bills');
+    Route::get('/products-print',[ ProductController::class, 'print'])->name('print.products');
 
 });
 

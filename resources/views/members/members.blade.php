@@ -60,19 +60,23 @@
                                         </td> --}}
                                         <td class="align-middle d-flex ">
                                             <a href="{{ route('members.update', $member->id) }}">
-                                                <button type="button" class="btn btn-success me-2">Update</button>
+                                                <button type="button" class="btn btn-success me-2">Detail</button>
                                             </a>
                                           <form action="{{ route('members.destroy', $member->id)}}" method="POST">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger">Delete</button>
                                           </form>
+
                                         </td>
                                     </tr>
                                 @endforeach
 
                             </tbody>
                         </table>
+                        <div class="d-flex justify-content-center mt-3">
+                            {{ $members->appends(request()->query())->links('pagination::bootstrap-4') }}
+                        </div>
                     </div>
                 </div>
             </div>

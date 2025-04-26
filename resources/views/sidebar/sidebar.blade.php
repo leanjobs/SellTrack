@@ -13,7 +13,7 @@
     <ul class="navbar-nav">
         <li class="nav-item">
             <a class="nav-link text-dark" href="/dashboard" data-position="dashboard">
-                <i class="material-symbols-rounded opacity-5">table_view</i>
+                <i class="material-symbols-rounded opacity-5">dashboard</i>
                 <span class="nav-link-text ms-1">Dashboard</span>
             </a>
         </li>
@@ -22,32 +22,32 @@
         </li>
         <li class="nav-item">
             <a class="nav-link text-dark" href="/members" data-position="members">
-                <i class="material-symbols-rounded opacity-5">receipt_long</i>
+                <i class="material-symbols-rounded opacity-5">loyalty</i>
                 <span class="nav-link-text ms-1">Members</span>
             </a>
         </li>
         @if (auth()->user()->role == "super_admin")
         <li class="nav-item">
             <a class="nav-link text-dark" href="/categories" data-position="categories">
-                <i class="material-symbols-rounded opacity-5">table_view</i>
+                <i class="material-symbols-rounded opacity-5">category</i>
                 <span class="nav-link-text ms-1">Categories</span>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link text-dark" href="/users" data-position="users">
-                <i class="material-symbols-rounded opacity-5">receipt_long</i>
+                <i class="material-symbols-rounded opacity-5">person</i>
                 <span class="nav-link-text ms-1">Users</span>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link text-dark" href="/branches" data-position="branches">
-                <i class="material-symbols-rounded opacity-5">receipt_long</i>
+                <i class="material-symbols-rounded opacity-5">storefront</i>
                 <span class="nav-link-text ms-1">Branches</span>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link text-dark" href="/products" data-position="products">
-                <i class="material-symbols-rounded opacity-5">dashboard</i>
+                <i class="material-symbols-rounded opacity-5">menu_book</i>
                 <span class="nav-link-text ms-1">Products</span>
             </a>
         </li>
@@ -57,14 +57,14 @@
         </li>
         <li class="nav-item">
             <a class="nav-link text-dark" href="/pos-system" data-position="cashier">
-                <i class="material-symbols-rounded opacity-5">table_view</i>
+                <i class="material-symbols-rounded opacity-5">point_of_sale</i>
                 <span class="nav-link-text ms-1">POS System</span>
             </a>
         </li>
         @if (auth()->user()->role == "super_admin" || auth()->user()->role == "admin" )
         <li class="nav-item">
             <a class="nav-link text-dark" href="/discounts" data-position="discounts">
-                <i class="material-symbols-rounded opacity-5">receipt_long</i>
+                <i class="material-symbols-rounded opacity-5">percent</i>
                 <span class="nav-link-text ms-1">Discounts</span>
             </a>
         </li>
@@ -92,13 +92,13 @@
 
         <li class="nav-item">
             <a class="nav-link text-dark" href="/incoming-stocks" data-position="incoming-stocks">
-                <i class="material-symbols-rounded opacity-5">table_view</i>
+                <i class="material-symbols-rounded opacity-5">call_received</i>
                 <span class="nav-link-text ms-1">Incoming Stocks</span>
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link text-dark" href="/outgoing-stocks" data-position="outgoing-stocks">
-                <i class="material-symbols-rounded opacity-5">receipt_long</i>
+                <i class="material-symbols-rounded opacity-5">north_west</i>
                 <span class="nav-link-text ms-1">Outgoing Stocks</span>
             </a>
         </li>

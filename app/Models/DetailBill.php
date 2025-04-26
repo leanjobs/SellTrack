@@ -19,4 +19,7 @@ class DetailBill extends Model
     public function discount(){
         return $this->belongsTo(Discount::class, 'discounts_id');
     }
+    public function bill(){
+        return $this->belongsTo(Bill::class, 'bills_id');
+    }
 }

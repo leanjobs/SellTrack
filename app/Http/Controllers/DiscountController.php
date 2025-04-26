@@ -29,7 +29,7 @@ class DiscountController extends Controller
                     } else {
                         $query->where('branches_id', $userBranchId);
                     }
-                })->where('discount_name', 'like', '%' .$search. '%')->where('status', 'active')->latest()->get();
+                })->where('discount_name', 'like', '%' .$search. '%')->where('status', 'active')->latest()->paginate(10);
             }else{
                 $discounts = Discount::with(['detail_discounts', 'branches'])->where(function ($query) use ($userBranchId, $userRole) {
                     if ($userRole == "super_admin") {
@@ -37,7 +37,7 @@ class DiscountController extends Controller
                     } else {
                         $query->where('branches_id', $userBranchId);
                     }
-                })->where('status', 'active')->latest()->get();
+                })->where('status', 'active')->latest()->paginate(10);
             }
 
 

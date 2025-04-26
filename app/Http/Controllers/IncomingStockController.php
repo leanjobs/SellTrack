@@ -30,9 +30,9 @@ class IncomingStockController extends Controller
                     });
                 })
                 ->latest()
-                ->get();
+                ->paginate(10);
             }else{
-                $incomingStocks = IncomingStock::with('product_detail')->where('branches_id', $userBranchId)->latest()->get();
+                $incomingStocks = IncomingStock::with('product_detail')->where('branches_id', $userBranchId)->latest()->paginate(10);
             }
 
 

@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\IncomingStock;
+use App\Models\OutgoingStock;
 use App\Models\Product;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Spatie\Browsershot\Browsershot;
 
 class ProductController extends Controller
 {
@@ -17,39 +20,50 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        try{
+        try {
             $userBranchId = Auth::user()->branches_id;
             $search = $request->input('search');
-            if($search){
-                $products = Product::with(['product_category', 'incoming_stocks' => function ($query) use ($userBranchId){
-                    $query->where('branches_id', $userBranchId)->whereDate("expired", ">=", today());
-                }])->where('product_name', 'like', '%' .$search. '%' )->latest()->get();
-            }else{
-                $products = Product::with(['product_category', 'incoming_stocks' => function ($query) use ($userBranchId){
-                    $query->where('branches_id', $userBranchId)->whereDate("expired", ">=", today());
-                }])->latest()->get();
+            // if ($search) {
+            //     $products = Product::with(['product_category', 'incoming_stocks' => function ($query) use ($userBranchId) {
+            //         $query->where('branches_id', $userBranchId)->whereDate("expired", ">=", today());
+            //     }])->where('product_name', 'like', '%' . $search . '%')->latest()->get();
+            // } else {
+            //     $products = Product::with(['product_category', 'incoming_stocks' => function ($query) use ($userBranchId) {
+            //         $query->where('branches_id', $userBranchId)->whereDate("expired", ">=", today());
+            //     }])->latest()->get();
+            // }
+
+            $query = Product::with(['product_category', 'incoming_stocks' => function ($query) use ($userBranchId) {
+                $query->where('branches_id', $userBranchId)->whereDate("expired", ">=", today());
+            }]);
+
+            if ($search) {
+                $query->where('product_name', 'like', '%' . $search . '%');
             }
 
-            $closeExpired = collect($products)
-            ->flatMap(fn($product) => $product->incoming_stocks)
-            ->filter(function ($incoming_stock) {
-                $daysLeft = Carbon::now()->diffInDays(Carbon::parse($incoming_stock->expired), false);
-                return $daysLeft >= 0 && $daysLeft <= 5;
-            })
-            ->sortBy('expired');
 
-            $runningLow = collect($products)
-            ->flatMap(fn($product) => $product->incoming_stocks)
-            ->filter(function ($incoming_stock) {
-                return $incoming_stock->current_stocks <= 10;
-            })
-            ->sortBy('current_stocks');
-            Log::info($runningLow);
+            $queryProducts = $query->latest()->get();
+            $products = $query->latest()->paginate(10);
+            Log::info($products);
+
+            $closeExpired = collect($queryProducts)
+                ->flatMap(fn($product) => $product->incoming_stocks)
+                ->filter(function ($incoming_stock) {
+                    $daysLeft = Carbon::now()->diffInDays(Carbon::parse($incoming_stock->expired), false);
+                    return $daysLeft >= 0 && $daysLeft <= 5;
+                })
+                ->sortBy('expired');
 
 
-            return view('products.products', compact(['products', 'closeExpired', 'runningLow']));
+            $runningLow = collect($queryProducts)
+                ->flatMap(fn($product) => $product->incoming_stocks)
+                ->filter(function ($incoming_stock) {
+                    return $incoming_stock->current_stocks <= 10;
+                })
+                ->sortBy('current_stocks');
 
-        }catch(Exception $e){
+            return view('products.products', compact(['products', 'closeExpired', 'runningLow', 'queryProducts']));
+        } catch (Exception $e) {
             Log::error($e->getMessage());
         }
     }
@@ -68,7 +82,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        try{
+        try {
             // dd($request);
             $validated = $request->validate([
                 'product_name' => 'string|required',
@@ -76,8 +90,8 @@ class ProductController extends Controller
                 'categories_id' => 'required|exists:categories,id'
             ]);
 
-             //add product img
-             if($request->file('product_img')){
+            //add product img
+            if ($request->file('product_img')) {
                 $validated['product_img'] = $request->file('product_img')->store('product_img');
             }
 
@@ -90,8 +104,8 @@ class ProductController extends Controller
             $product->update(['product_code' => $product_code]);
 
             return redirect()->route('products.index')->with('success', 'Product created successfully');
-        }catch(Exception $e){
-             dd($e);
+        } catch (Exception $e) {
+            dd($e);
             return redirect()->route('products.create')->with('error', 'Failed to create product');
         }
     }
@@ -108,17 +122,14 @@ class ProductController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Product $product)
-    {
-
-    }
+    public function edit(Product $product) {}
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Product $product)
     {
-        try{
+        try {
             $validated = $request->validate([
                 'product_name' => 'string|required',
                 'price' => 'numeric|required',
@@ -126,16 +137,16 @@ class ProductController extends Controller
             ]);
 
             //add product img
-            if($request->file('product_img')){
+            if ($request->file('product_img')) {
                 $validated['product_img'] = $request->file('product_img')->store('product_img');
             }
 
             $product->update($validated);
 
             return redirect()->route('products.index')->with('success', 'Product Updated');
-        }catch(Exception $e){
+        } catch (Exception $e) {
             // dd($e);
-           return redirect()->route('products.create')->with('error', 'Failed to update product');
+            return redirect()->route('products.create')->with('error', 'Failed to update product');
         }
     }
 
@@ -144,12 +155,42 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        try{
+        try {
             $product->delete();
             return redirect()->route('products.index')->with('success', 'Product deleted');
-        }catch(Exception $e){
-           return redirect()->route('products.index')->with('error', 'Failed to delete product');
-
+        } catch (Exception $e) {
+            return redirect()->route('products.index')->with('error', 'Failed to delete product');
         }
+    }
+
+    public function print()
+    {
+        $userBranchId = Auth::user()->branches_id;
+        $products = Product::with(['product_category', 'incoming_stocks' => function ($query) use ($userBranchId) {
+            $query->where('branches_id', $userBranchId)->whereDate("expired", ">=", today());
+        }])->latest()->get();
+        $closeExpired = collect($products)
+            ->flatMap(fn($product) => $product->incoming_stocks)
+            ->filter(function ($incoming_stock) {
+                $daysLeft = Carbon::now()->diffInDays(Carbon::parse($incoming_stock->expired), false);
+                return $daysLeft >= 0 && $daysLeft <= 5;
+            })
+            ->sortBy('expired');
+
+        $runningLow = collect($products)
+            ->flatMap(fn($product) => $product->incoming_stocks)
+            ->filter(function ($incoming_stock) {
+                return $incoming_stock->current_stocks <= 10;
+            })
+            ->sortBy('current_stocks');
+        $incomingStocks = IncomingStock::with('product_detail')->where('branches_id', $userBranchId)->latest()->get();
+        $outgoingStocks = OutgoingStock::with(['detail_bill', 'incoming_stock.product_detail'])
+        ->whereHas('incoming_stock', function ($query) use ($userBranchId) {
+            $query->where('branches_id', $userBranchId);})
+        ->latest()
+        ->get();
+        $outgoingStocks->load(['detail_bill', 'incoming_stock']);
+
+        return view('print.print-products', compact(['products', 'closeExpired', 'runningLow', 'incomingStocks', 'outgoingStocks']));
     }
 }

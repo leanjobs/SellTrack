@@ -31,7 +31,8 @@
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Product Name</th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Product Code</th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Quantity</th>
-                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Detail Bills Id</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Bills Id</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Status</th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Created At</th>
                                 </tr>
                             </thead>
@@ -56,7 +57,11 @@
                                         </td>
                                         <td class="align-middle ">
                                             <span
-                                                class="text-secondary text-xs font-weight-bold">{{ $outgoingStock->detail_bills_id }}</span>
+                                                class="text-secondary text-xs font-weight-bold">{{ $outgoingStock->detail_bill->bills_id }}</span>
+                                        </td>
+                                        <td class="align-middle ">
+                                            <span
+                                                class="text-secondary text-xs font-weight-bold">{{ $outgoingStock->detail_bill->bill->payment->status }}</span>
                                         </td>
                                         <td class="align-middle ">
                                             <span
@@ -68,6 +73,9 @@
 
                             </tbody>
                         </table>
+                        <div class="d-flex justify-content-center mt-3">
+                            {{ $queryOutgoingStocks->appends(request()->query())->links('pagination::bootstrap-4') }}
+                        </div>
                     </div>
                 </div>
             </div>

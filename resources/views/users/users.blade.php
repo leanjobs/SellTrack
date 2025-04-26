@@ -40,6 +40,7 @@
                                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Role</th>
                                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Branch</th>
                                     <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Position</th>
+                                    <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total Bills</th>
                                     <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
                                     <th class=" text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Action</th>
                                 </tr>
@@ -80,6 +81,10 @@
                                         </td>
                                         <td class="align-middle text-center text-sm">
                                             <span
+                                            class="text-secondary text-sm font-weight-bold">{{ $user->total_bills }}</span>
+                                        </td>
+                                        <td class="align-middle text-center text-sm">
+                                            <span
                                             class="text-secondary text-sm font-weight-bold">{{ $user->status }}</span>
                                         </td>
                                         <td class="align-middle d-flex pb-6">
@@ -94,9 +99,11 @@
                                         </td>
                                     </tr>
                                 @endforeach
-
                             </tbody>
                         </table>
+                        <div class="d-flex justify-content-center mt-3">
+                            {{ $users->appends(request()->query())->links('pagination::bootstrap-4') }}
+                        </div>
                     </div>
                 </div>
             </div>

@@ -29,7 +29,7 @@
             {{-- category section --}}
             <div class="d-flex overflow-x-auto gap-3" id="category-section" style="max-width: 100%; white-space: nowrap;">
                 <div class="col-3 pb-3">
-                    <button class="btn border-0  w-100 p-0 filter_category" data-category="all">
+                    <button class="btn border-0  w-100 p-0 filter_category active" data-filter="all">
                         <div class="card bg-dark">
                             <div class="card-header p-2 pb-0 bg-dark">
                                 <h6 class="mb-0 text-center text-white">All</h6>
@@ -43,10 +43,26 @@
                     </button>
                 </div>
 
+                {{-- discount section --}}
+                <div class="col-3 pb-3">
+                    <button class="btn border-0 bg-transparent w-100 p-0 filter_category" data-filter="discount">
+                        <div class="card ">
+                            <div class="card-header p-2 pb-0 ">
+                                <h6 class="mb-0 text-center ">Discounts</h6>
+                            </div>
+                            {{-- <hr class="dark horizontal my-0 " style="color: white"> --}}
+                            <div class="card-footer p-2 pt-0">
+                                <p class="mb-0 text-xs text-center ">{{ $discountedProductCount }} products in stocks
+                                </p>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+
                 @foreach ($categories as $category)
                     <div class="col-3 pb-3">
                         <button class="btn border-0 bg-transparent w-100 p-0 filter_category"
-                            data-category="{{ $category->id }}">
+                            data-filter="{{ $category->id }}">
                             <div class="card">
                                 <div class="card-header p-2 pb-0">
                                     <h6 class="mb-0 text-center">{{ $category->category_name }}</h6>
@@ -116,55 +132,10 @@
                 </div>
                 <div class="" id="bill-section">
                     <div class="overflow-y-auto mb-3" style="max-height: 50vh; overflow-y: auto;" id="cart_items">
-                        {{-- <div class="row d-flex align-items-center mb-3">
-                            <div class="col-3">
-                                <img src="{{ asset('assets/img/meeting.jpg') }}" alt="product img"
-                                    style="height: 90px; width:90px;  object-fit: cover;">
-                            </div>
-                            <div class="col-9">
-                                <div class="d-flex justify-content-between">
-                                    <p class="text-dark fs-6 fw-bold">Producttt</p>
-                                    <i class="material-symbols-rounded fs-5 text-dark">delete</i>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="d-flex">
-                                        <button class="btn border-0  w-100 p-0">
-                                            <i
-                                            class="material-symbols-rounded fs-5 text-dark d-flex align-items-center border border-dark rounded-circle p-1 border-2">add</i>
-                                        </button>
-                                        <p class="text-dark fs-6 fw-bold px-4 mb-0">1</p>
-                                        <button class="btn border-0  w-100 p-0">
-                                            <i class="material-symbols-rounded fs-5 text-dark d-flex align-items-center border border-dark rounded-circle p-1 border-2">remove</i>
-                                        </button>
-                                    </div>
-                                    <div class="text-end">
-                                        <p class="text-dark fs-6 fw-bold mb-0">Rp 20.000</p>
-                                        <p class="text-dark fs-6 fw-bold mb-0">Rp 200.000</p>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div> --}}
+                        {{-- cart item tht u have choose --}}
                     </div>
                     <div id="selected_cheap_redemptions">
-                        {{-- <div class="mb-3 p-3 border border-dark rounded selected_cheap_redemption"  style="min-width: 100%; max-width:100%" >
-                            <div class="d-flex justify-content-between">
-                            <p class="fs-6 text-dark mb-0 text-m text-bold">Tebus Murah</p>
-                            <button type="button" class="btn bg-success mb-2 px-2 py-1 text-white">Add</button>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <p class="fs-6 text-dark mb-0 ">Min. Total Price</p>
-                                <p class="fs-6 text-dark mb-0 ">Rp 100.000</p>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <p class="fs-6 text-dark mb-0 ">SUSU - 010101010</p>
-                                <p class="fs-6 text-dark mb-0 ">x1</p>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <p class="fs-6 text-dark mb-0 "></p>
-                                <p class="fs-6 text-dark mb-0 ">Rp 10.000</p>
-                            </div>
-                        </div> --}}
+                       {{-- selected cheap redemption --}}
                     </div>
                     <h5 class="mb-2 text-dark">Cheap Redemptions</h5>
                     <div class="d-flex overflow-x-auto gap-3" style="max-width: 100%; white-space: nowrap;"
@@ -191,8 +162,8 @@
                                     </div>
                                     <div class="d-flex justify-content-between">
                                         <p class="fs-6 text-gray-400 mb-0 detail_product">
-                                            {{ $discount->detail_discounts->free_product->product_name }} -
-                                            {{ $discount->detail_discounts->free_product->product_code }}</p>
+                                            {{ $discount->detail_discounts->product->product_name ?? "-" }} -
+                                            {{ $discount->detail_discounts->product->product_code }}</p>
                                         <p class="fs-6 text-gray-400 mb-0 ">
                                             x{{ $discount->detail_discounts->min_quantity }}</p>
                                     </div>
@@ -294,11 +265,10 @@
             );
 
             function onScanSuccess(decodedText, decodedResult) {
-                console.log("decode", decodedResult.decodedText);
                 $('#prodcut-code').text("Hasil Scan: " + decodedText);
                 $('#scan-product-code').val(decodedText);
 
-                let scannedProduct = $(`.product_item[data-code="${decodedText}"]`);
+                let scannedProduct = $(`.btn-add-item[data-code="${decodedText}"]`);
                 if (scannedProduct.length > 0) {
                     scannedProduct.trigger('click');
                     html5QRCodeScanner.pause();
@@ -306,7 +276,7 @@
                     $('#scan-result').addClass('d-flex justify-content-between');
 
                 } else {
-                    console.log("Produk tidak ditemukan dari hasil scan:", decodedText);
+                    console.log("Product not found :", decodedText);
                 }
             }
 
@@ -327,7 +297,6 @@
                     $('#scan-section').removeClass('d-none');
 
                     if ($('#reader').is(':empty')) {
-                        console.log("teste")
 
                         html5QRCodeScanner.render(onScanSuccess);
                     }
@@ -361,7 +330,7 @@
             });
 
             $(".filter_category").on("click", function() {
-                let categoryId = $(this).data("category");
+                let filter = $(this).data("filter");
                 if ($(this).hasClass("active")) return;
 
                 $(".filter_category").removeClass("active").find(".card, .card-header, h6, p")
@@ -378,7 +347,7 @@
                     url: "{{ route('filter.products') }}",
                     type: "GET",
                     data: {
-                        category_id: categoryId
+                        filter: filter
                     },
                     success: function(response) {
                         $("#products_list").html(response);
@@ -388,6 +357,9 @@
                     }
                 });
             });
+
+            $(".filter_category.active").trigger("click");
+
 
             $(".payment_method").on("click", function() {
                 if ($(this).hasClass("active")) return;
@@ -476,12 +448,13 @@
                 let stock = parseInt(productStock.text()) - productChange;
                 let price = parseInt(cartItem.data("price"));
 
-                console.log("stock", stock);
+                console.log(productId, stock);
+
 
                 if (remove) {
                     let resetStock = stock + quantity;
                     productStock.text(resetStock);
-                    $(`.product_item[id=${productId}]`).prop("disabled", false).removeClass("disabled");
+                    $(`.btn-add-item[id=${productId}]`).prop("disabled", false).removeClass("disabled");
                     updateSummary();
                     cartItem.remove();
                 } else {
@@ -496,10 +469,10 @@
 
                     productStock.text(stock);
                     if (stock <= 0) {
-                        $(`.product_item[id=${productId}]`).prop("disabled", true).addClass("disabled");
+                        $(`.btn-add-item[id=${productId}]`).prop("disabled", true).addClass("disabled");
                         addBtn.prop("disabled", true).addClass("disabled");
                     } else {
-                        $(`.product_item[id=${productId}]`).prop("disabled", false).removeClass("disabled");
+                        $(`.btn-add-item[id=${productId}]`).prop("disabled", false).removeClass("disabled");
                         addBtn.prop("disabled", false).removeClass("disabled");
                     }
                 }
@@ -562,11 +535,11 @@
                                         // buy x get y
                                         let freeDiscountQuantity = discountInstances * discount
                                             .detail_discounts.quantity_free_products;
-                                        console.log("remove", remove);
+
                                         if(remove){
-                                            updateCartItem(productId, -detail.quantity_free_products);
+                                            updateCartItem(discount.detail_discounts.free_products_id, -detail.quantity_free_products);
                                         }else{
-                                            updateCartItem(productId, +(freeDiscountQuantity - parseInt(
+                                            updateCartItem(discount.detail_discounts.free_products_id, +(freeDiscountQuantity - parseInt(
                                             afterDiscountQuantity.text().replace("x", "").replace(/\./g,
                                                 ""))));
                                         }
@@ -597,18 +570,17 @@
                                 } else {
 
                                     if (discount.type === "buy_x_get_y" && remove == false) {
-                                        updateCartItem(productId, +detail.quantity_free_products);
+                                        updateCartItem(discount.detail_discounts.free_products_id, +detail.quantity_free_products);
                                     }
 
                                     if (discount.type === "buy_x_get_y" && remove == true) {
-                                        updateCartItem(productId, -detail.quantity_free_products);
+                                        updateCartItem(discount.detail_discounts.free_products_id, +detail.quantity_free_products);
                                     }
 
                                     cartItem.find(".discount_item").remove();
 
                                     if ((discount.type == "member" && selectedMembers) || discount.type !=
                                         "member") {
-                                        console.log("hello");
                                         cartItem.append(discountCard);
                                     }
                                     updateSummary();
@@ -633,14 +605,14 @@
 
 
 
-            $('.product_item').on('click', function() {
-                console.log("hasil product di clisk", $(this));
-                let productId = $(this).attr("id");
-                let productName = $(this).find(".product_name").text();
-                let productPrice = $(this).find(".product_price").text().replace("Rp ", "").replace(/\./g,
+            $('.btn-add-item').on('click', function() {
+                let productItem = $(this).closest(".product_item");
+                let productId = productItem.attr("id");
+                let productName = productItem.find(".product_name").text();
+                let productPrice = productItem.find(".product_price").text().replace("Rp ", "").replace(/\./g,
                     "");
-                let productImage = $(this).find(".product_img").attr("src");
-                let productStock = $(this).find(".product_stock");
+                let productImage = productItem.find(".product_img").attr("src");
+                let productStock = productItem.find(".product_stock");
 
                 if (parseInt(productStock.text()) <= 0) return;
 
@@ -828,7 +800,6 @@
                     </div>
                 `);
                     $('#selected_cheap_redemptions').append(selectedCheapRedemptionItem);
-                    console.log("iddd", productsId);
                     updateCartItem(productsId, +quantityProducts);
 
                 }
@@ -892,9 +863,7 @@
                             total_price = parseInt(afterDiscount);
                         }
                         if (!isNaN(afterDiscountQuantity) && afterDiscountQuantity !== "") {
-                        console.log(afterDiscountQuantity);
                             quantity += parseInt(afterDiscountQuantity);
-                            console.log("qty", quantity)
                         }
                     }
 
@@ -923,7 +892,6 @@
                     payment_method: paymentMethod
                 };
 
-                console.log(bills);
 
                 $.ajax({
                     url: "/bills",
@@ -940,21 +908,6 @@
                         }else if( response.data.payment.payment_type == "qr"){
                             snap.pay(snapToken, {
                             onSuccess: function(result) {
-                            //     $.ajax({
-                            //     url: '/api/handle-midtrans',
-                            //     method: 'POST',
-                            //     data: {
-                            //         _token: '{{ csrf_token() }}',
-                            //         order_id: result.order_id,
-                            //         transaction_status: result.transaction_status,
-                            //     },
-                            //     success: function(responseHandle) {
-                            //         showBill(response);
-                            //     },
-                            //     error: function(xhr) {
-                            //         alert("Gagal update data pembayaran.");
-                            //     }
-                            // });
                             showBill(response)
                             },
                             onPending: function(result) {
@@ -974,12 +927,11 @@
             function showBill(response){
                 localStorage.clear();
                 const bill = response.data.bill;
+                const payment = response.data.payment;
                 const detail_bill = response.data.detail_bill;
                 const date = new Date(bill.created_at);
                 const formattedDate = date.toLocaleDateString('en-US');
 
-
-                console.log(response.data);
 
 
                 $(".modal-body .mb-3").html(`
@@ -1024,6 +976,9 @@
                 </div>
                 `;
                 $(".modal-body .payment-summary").html(summary);
+                $(".modal-body .payment-method").html(`
+                    <small class="text-muted">Payment Method: <strong>${payment.payment_type}</strong></small>
+                `);
 
 
                 $("#receiptModal").modal("show");

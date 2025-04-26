@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bill;
 use App\Models\Member;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class MemberController extends Controller
@@ -17,9 +19,9 @@ class MemberController extends Controller
         try{
             $search = $request->input('search');
             if($search){
-                $members = Member::where('member_name', 'like', '%' .$search. '%')->get();
+                $members = Member::where('member_name', 'like', '%' .$search. '%')->paginate(10);
             }else{
-                $members = Member::all();
+                $members = Member::paginate(10);
             }
             return view('members.members', compact('members'));
 
@@ -62,7 +64,14 @@ class MemberController extends Controller
      */
     public function show(Member $member)
     {
-        return view('members.update', compact('member'));
+        $bills = Bill::where('members_id', $member->id)->latest()->get();
+        $result = DB::select("SELECT total_bills_by_member(?) AS total_bills", [$member->id]);
+        $total_bills = $result[0]->total_bills ?? 0;
+
+        foreach($bills as $bill){
+            $bill->load(['member', 'branch', 'users', 'payment']);
+        }
+        return view('members.update', compact(['member', 'bills', 'total_bills']));
     }
 
     /**

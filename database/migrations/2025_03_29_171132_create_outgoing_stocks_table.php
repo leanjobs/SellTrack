@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('outgoing_stocks', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('incoming_stocks_id')->constrained('incoming_stocks', 'id');
-            $table->integer('quantity');
-            $table->foreignId('detail_bills_id')->constrained('detail_bills', 'id');
-            $table->softDeletes();
-            $table->timestamps();
-        });
+            Schema::create('outgoing_stocks', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('incoming_stocks_id')->constrained('incoming_stocks', 'id');
+                $table->integer('quantity');
+                $table->foreignId('detail_bills_id')->constrained('detail_bills', 'id');
+                $table->softDeletes();
+                $table->timestamps();
+            });
     }
 
     /**

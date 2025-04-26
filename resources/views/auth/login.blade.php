@@ -42,6 +42,45 @@
       <div class="col-12">
         <!-- Navbar -->
         <!-- End Navbar -->
+        <div class="position-fixed bottom-1 end-1 z-index-2 p-3" style="z-index: 9999">
+            @if (session('success'))
+                <div id="successToast" class="toast hide p-2 bg-white" role="alert" aria-live="assertive"
+                    aria-atomic="true">
+                    <div class="toast-header border-0">
+                        <i class="material-symbols-rounded text-success me-2">check</i>
+                        <span class="me-auto font-weight-bold">Success</span>
+                        <small class="text-body">Just now</small>
+                        <button type="button" class="border-0 bg-transparent align-items-center d-flex"
+                            data-bs-dismiss="toast" aria-label="Close">
+                            <i class="material-symbols-rounded opacity-5">close</i>
+                        </button>
+                    </div>
+                    <hr class="horizontal dark m-0">
+                    <div class="toast-body">
+                        {{ session('success') }}
+                    </div>
+                </div>
+            @elseif (session('error'))
+                <div class="toast fade hide p-2 mt-2 bg-white" role="alert" aria-live="assertive" id="dangerToast"
+                    aria-atomic="true">
+                    <div class="toast-header border-0">
+                        <i class="material-symbols-rounded text-danger me-2">
+                            campaign
+                        </i>
+                        <span class="me-auto text-gradient text-danger font-weight-bold">Failed</span>
+                        <small class="text-body">Just now</small>
+                        <button type="button" class="border-0 bg-transparent align-items-center d-flex"
+                            data-bs-dismiss="toast" aria-label="Close">
+                            <i class="material-symbols-rounded opacity-5">close</i>
+                        </button>
+                    </div>
+                    <hr class="horizontal dark m-0">
+                    <div class="toast-body">
+                        {{ session('error') }}
+                    </div>
+                </div>
+            @endif
+        </div>
       </div>
     </div>
   </div>
@@ -120,6 +159,22 @@
       Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
     }
   </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var successToast = document.getElementById("successToast");
+        if (successToast) {
+            var toastBootstrap = new bootstrap.Toast(successToast);
+            toastBootstrap.show();
+        }
+    });
+    document.addEventListener("DOMContentLoaded", function() {
+        var successToast = document.getElementById("dangerToast");
+        if (successToast) {
+            var toastBootstrap = new bootstrap.Toast(successToast);
+            toastBootstrap.show();
+        }
+    });
+</script>
   <!-- Github buttons -->
   <script async defer src="https://buttons.github.io/buttons.js"></script>
   <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->

@@ -8,7 +8,7 @@
             <div class="d-flex justify-content-between">
               <div>
                 <p class="text-sm mb-0 text-capitalize">Total Product</p>
-                <h4 class="mb-0">{{ $products->count() }}</h4>
+                <h4 class="mb-0">{{ $queryProducts->count() }}</h4>
               </div>
             </div>
           </div>
@@ -26,7 +26,7 @@
                 <p class="text-sm mb-0 text-capitalize">Overall product stock</p>
                 <h4 class="mb-0">
                     {{
-                        collect($products)->flatMap(function ($product) {
+                        collect($queryProducts)->flatMap(function ($product) {
                             return $product['incoming_stocks'];
                         })->sum('current_stocks')
                     }}
@@ -86,11 +86,18 @@
                     <div
                         class="bg-gradient-dark shadow-dark border-radius-lg pt-4 pb-3 d-flex align-items-center justify-content-between px-3">
                         <h6 class="text-white text-capitalize ">Products table</h6>
-                        <span class="d-flex align-items-center justify-content-center ms-auto p-1 bg-white rounded-3 shadow">
-                            <a href="{{ route('products.create') }}" class="d-flex align-items-center">
-                                <i class="material-symbols-rounded fs-3 text-dark">add</i>
-                            </a>
-                        </span>
+                        <div class="d-flex gap-2">
+                            <span class="d-flex align-items-center justify-content-center ms-auto p-1 bg-white rounded-3 shadow">
+                                <a href="{{ route('print.products') }}" target="_blank" class="d-flex align-items-center">
+                                    <i class="material-symbols-rounded fs-3 text-dark">picture_as_pdf</i>
+                                </a>
+                            </span>
+                            <span class="d-flex align-items-center justify-content-center ms-auto p-1 bg-white rounded-3 shadow">
+                                <a href="{{ route('products.create') }}" class="d-flex align-items-center">
+                                    <i class="material-symbols-rounded fs-3 text-dark">add</i>
+                                </a>
+                            </span>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body px-0 pb-2">
@@ -163,7 +170,7 @@
                                         </td>
                                         <td class="align-middle text-center">
                                             <span
-                                                class="text-secondary text-sm font-weight-bold">Rp{{ number_format($product->price) }}</span>
+                                                class="text-secondary text-sm font-weight-bold">Rp {{ number_format($product->price) }}</span>
                                         </td>
                                         <td class="align-middle text-center text-sm">
                                             <span
@@ -187,10 +194,14 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        <div class="d-flex justify-content-center mt-3">
+                            {{ $products->appends(request()->query())->links('pagination::bootstrap-4') }}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     </div>
+    
 @endsection

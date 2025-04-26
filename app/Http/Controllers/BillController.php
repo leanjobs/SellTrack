@@ -8,12 +8,14 @@ use App\Models\DetailDiscount;
 use App\Models\IncomingStock;
 use App\Models\OutgoingStock;
 use App\Models\Payment;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-
+use Spatie\Browsershot\Browsershot;
 
 class BillController extends Controller
 {
@@ -23,7 +25,7 @@ class BillController extends Controller
     public function index()
     {
         $userBranchId = Auth::user()->branches_id;
-        $bills = Bill::with(['users', 'member', 'payment'])->where('branches_id', $userBranchId)->latest()->get();
+        $bills = Bill::with(['users', 'member', 'payment'])->where('branches_id', $userBranchId)->latest()->paginate(10);
         // $bills->load(['users', 'member', 'payment']);
 
         return view('bills.bills', compact('bills'));
@@ -152,14 +154,14 @@ class BillController extends Controller
     public function show(Bill $bill)
     {
         try {
-            $bill->load(['member', 'branch', 'users']);
+            $bill->load(['member', 'branch', 'users', 'payment']);
             $detail_bills = DetailBill::where('bills_id', $bill->id)->latest()->get();
             foreach ($detail_bills as $detail_bill) {
                 $detail_bill->load(['product', 'discount']);
             }
             $data = [
                 'bill' => $bill,
-                'detail_bill' => $detail_bills
+                'detail_bill' => $detail_bills,
             ];
             return response()->json(['message' => 'successfully', 'data' => $data]);
         } catch (Exception $e) {
@@ -190,5 +192,14 @@ class BillController extends Controller
     public function destroy(Bill $bill)
     {
         //
+    }
+
+    public function print(Request $request){
+        $startDate = Carbon::parse($request->input('start_date'))->startOfDay();
+        $endDate = Carbon::parse($request->input('end_date'))->endOfDay();
+
+        $userBranchId = Auth::user()->branches_id;
+        $bills = Bill::with(['users', 'member', 'payment'])->where('branches_id', $userBranchId)->whereBetween('created_at', [$startDate, $endDate])->latest()->get();
+        return view('print.print-bills', compact(['bills', 'startDate', 'endDate']));
     }
 }

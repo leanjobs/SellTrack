@@ -338,12 +338,12 @@
     </div>
     <script>
         $(document).ready(function() {
-            $('.select2').select2({
-                theme: 'bootstrap-5',
-                width: '100%',
-                placeholder: "-- Search and select --",
-                allowClear: true
-            });
+            // $('.select2').select2({
+            //     theme: 'bootstrap-5',
+            //     width: '100%',
+            //     placeholder: "-- Search and select --",
+            //     allowClear: true
+            // });
 
 
             function toggleBranchSelection() {

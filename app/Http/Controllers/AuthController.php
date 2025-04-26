@@ -10,20 +10,19 @@ class AuthController extends Controller
     public function login(Request $request){
         if(Auth::attempt($request->only('email', 'password'))){
             $user = Auth::user();
-            if($user->role === "super_admin"){
-                return redirect('/dashboard');
-            }elseif($user->role === "admin"){
-                return redirect('/dashboard');
-            }elseif($user->role === "staff"){
-                return redirect('/dashboard');
-            }else{
-                return redirect('/login');
+            if($user->status === "active"){
+                if($user->role === "super_admin"){
+                    return redirect('/dashboard');
+                }elseif($user->role === "admin"){
+                    return redirect('/dashboard');
+                }elseif($user->role === "staff"){
+                    return redirect('/dashboard');
+                }else{
+                    return redirect('/login');
+                }
             }
-        dd('login gagal', $request->all());
             return redirect()->back()->with('error', 'failed to login');
         }
-        dd('login gagal', $request->all());
-
         return redirect()->back()->with('error', 'failed to login');
     }
     public function logout()

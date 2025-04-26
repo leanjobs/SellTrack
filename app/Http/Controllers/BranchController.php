@@ -19,9 +19,9 @@ class BranchController extends Controller
         try{
             $search = $request->input('search');
             if($search){
-                $branches = Branch::where('branch_name', 'like', '%' .$search. '%')->get();
+                $branches = Branch::where('branch_name', 'like', '%' .$search. '%')->paginate(10);
             }else{
-                $branches = Branch::all();
+                $branches = Branch::paginate(10);
             }
             return view('branches.branches', compact('branches'));
 

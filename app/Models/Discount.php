@@ -20,4 +20,8 @@ class Discount extends Model
   public function branches(){
     return $this->belongsTo(Branch::class, 'branches_id');
   }
+
+//   public function product(){
+//     return $this->belongsTo(Product::class, 'detail_discounts.products_id');
+//   }
 }

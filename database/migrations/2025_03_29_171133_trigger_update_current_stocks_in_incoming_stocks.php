@@ -39,6 +39,6 @@ return new class extends Migration
         //     //
         // });
 
-        DB::unprepared("DROP TRIGGER IF EXIXTS update_incoming_stocks");
+        DB::unprepared("DROP TRIGGER IF EXISTS update_incoming_stocks");
     }
 };

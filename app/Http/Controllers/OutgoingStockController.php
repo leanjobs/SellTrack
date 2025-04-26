@@ -19,22 +19,25 @@ class OutgoingStockController extends Controller
             $userBranchId = Auth::user()->branches_id;
             $search = $request->input('search');
 
-            $outgoingStocks = OutgoingStock::with(['detail_bill', 'incoming_stock.product_detail'])
+            $query = OutgoingStock::with(['detail_bill', 'incoming_stock.product_detail'])
                 ->whereHas('incoming_stock', function ($query) use ($userBranchId, $search) {
                     $query->where('branches_id', $userBranchId);
 
-                    if ($search) {
+             if ($search) {
                         $query->whereHas('product_detail', function ($q) use ($search) {
                             $q->where('product_name', 'like', '%' . $search . '%');
                         });
                     }
-                })
-                ->latest()
-                ->get();
+                });
+
+
+            $queryOutgoingStocks = $query->latest()->paginate(10);
+            $outgoingStocks = $query->latest()->get();
+
 
             $outgoingStocks->load(['detail_bill', 'incoming_stock']);
 
-            return view('outgoing-stocks.outgoing-stocks', compact('outgoingStocks'));
+            return view('outgoing-stocks.outgoing-stocks', compact(['outgoingStocks', 'queryOutgoingStocks']));
         } catch (Exception $e) {
             Log::info($e->getMessage());
         }

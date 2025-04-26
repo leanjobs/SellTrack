@@ -42,6 +42,8 @@
                                         Branch</th>
                                     @endif
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
+                                        Product</th>
+                                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                         Start Date</th>
                                     <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">
                                         End Date</th>
@@ -67,6 +69,9 @@
                                         </td>
                                         @endif
                                         <td class="align-middle ">
+                                            <span class="text-secondary text-xs font-weight-bold">{{ $discount->detail_discounts->product->product_name }}</span>
+                                        </td>
+                                        <td class="align-middle ">
                                             <span class="text-secondary text-xs font-weight-bold">{{ $discount->start_date }}</span>
                                         </td>
                                         <td class="align-middle ">
@@ -87,6 +92,9 @@
 
                             </tbody>
                         </table>
+                        <div class="d-flex justify-content-center mt-3">
+                            {{ $discounts->appends(request()->query())->links('pagination::bootstrap-4') }}
+                        </div>
                     </div>
                 </div>
             </div>

@@ -1,5 +1,6 @@
 @extends('layouts.main_layouts')
 @section('breadcrumb', 'Bills')
+@section('route-print', route('print.bills'))
 @section('content')
     <div class="row">
         <div class="col-12">
@@ -8,6 +9,12 @@
                     <div
                         class="bg-gradient-dark shadow-dark border-radius-lg pt-4 pb-3 d-flex align-items-center justify-content-between px-3">
                         <h6 class="text-white text-capitalize ">Bills table</h6>
+                        @if (auth()->user()->role != "staff")
+                            <a href="javascript:;" class="nav-link text-body p-0 d-flex align-items-center ms-auto p-1 bg-white rounded-3 shadow" id="dropdownFilterDate" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="material-symbols-rounded text-dark" style="font-size: 30px">picture_as_pdf</i>
+                            </a>
+                            @include('components.dropdown-filter-date')
+                        @endif
                     </div>
                 </div>
                 <div class="card-body px-0 pb-2">
@@ -87,21 +94,27 @@
                                                 class="text-secondary text-xs font-weight-bold">{{ $bill->created_at }}</span>
                                         </td>
                                         <td class="align-middle">
-                                            <button type="submit" class="btn bg-gradient-dark btn-receipt"
-                                                data-id="{{ $bill->id }}">
-                                                Receipt
-                                            </button>
-                                            <button type="button" class="btn bg-gradient-dark pay-now"
+                                            @if ($bill->payment->status == "waiting")
+                                                <button type="button" class="btn bg-gradient-dark pay-now"
                                                 data-snap="{{ $bill->payment->snap_token }}">
                                                 bayar
-                                            </button>
-                                            @include('components.modal-receipt')
+                                                </button>
+                                            @else
+                                                <button type="submit" class="btn bg-gradient-dark btn-receipt"
+                                                    data-id="{{ $bill->id }}">
+                                                    Receipt
+                                                </button>
+                                                @include('components.modal-receipt')
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach
 
                             </tbody>
                         </table>
+                        <div class="d-flex justify-content-center mt-3">
+                            {{ $bills->appends(request()->query())->links('pagination::bootstrap-4') }}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -134,10 +147,10 @@
                         });
                     },
                     onPending: function(result) {
-                        console.log("Masih pending", result);
+                        console.log("pending", result);
                     },
                     onError: function(result) {
-                        alert("Pembayaran gagal");
+                        alert("payment failed");
                     }
                 });
             });
@@ -154,6 +167,7 @@
                     contentType: "application/json",
                     success: function(response) {
                         const bill = response.data.bill;
+                        const payment = response.data.bill.payment;
                         const detail_bill = response.data.detail_bill;
                         const date = new Date(bill.created_at);
                         const formattedDate = date.toLocaleDateString('en-US');
@@ -204,6 +218,9 @@
                         $(".modal-footer .close-btn").html(`
                          <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Close</button>
                     `);
+                    $(".modal-body .payment-method").html(`
+                            <small class="text-muted">Payment Method: <strong>${payment.payment_type}</strong></small>
+                        `);
 
 
                         $("#receiptModal").modal("show");

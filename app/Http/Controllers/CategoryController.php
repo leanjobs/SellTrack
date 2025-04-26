@@ -17,9 +17,9 @@ class CategoryController extends Controller
         try{
             $search = $request->input('search');
             if($search){
-                $categories = Category::where('category_name', 'like', '%' .$search. '%')->get();
+                $categories = Category::where('category_name', 'like', '%' .$search. '%')->paginate(10);
             }else{
-                $categories = Category::all();
+                $categories = Category::paginate(10);
             }
             return view('categories.categories', compact('categories'));
         }catch(Exception $e){

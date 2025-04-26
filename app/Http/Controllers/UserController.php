@@ -6,6 +6,7 @@ use App\Models\Branch;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 use function PHPUnit\Framework\isNull;
@@ -20,10 +21,15 @@ class UserController extends Controller
         try{
             $search = $request->input('search');
             if($search){
-                $users = User::with('user_branch')->where('user_name', 'like', '%' .$search. '%')->get();
+                $users = User::with('user_branch')->where('user_name', 'like', '%' .$search. '%')->paginate(10);
             }else{
-                $users = User::with('user_branch')->latest()->get();
+                $users = User::with('user_branch')->latest()->paginate(10);
             }
+            foreach ($users as $user) {
+                $result = DB::select('CALL total_bills_by_user(?)', [$user->id]);
+                $user->total_bills = $result[0]->total_transaksi ?? 0;
+            }
+
             return view('users.users', compact('users'));
 
         }catch(Exception $e){

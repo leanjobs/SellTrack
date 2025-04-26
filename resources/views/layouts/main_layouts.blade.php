@@ -38,38 +38,62 @@
     <!-- CSS Files -->
     {{-- custom css select form cdn --}}
     <style>
-        /* Ubah background Select2 jadi transparan */
         .select2-container .select2-selection--single {
             background-color: transparent !important;
             font-size: 14px !important;
             color: black !important;
         }
 
-        /* Ubah warna teks di dalam dropdown */
         .select2-container--default .select2-results__option {
             color: black !important;
         }
 
-        /* Ubah warna teks yang dipilih */
         .select2-container--default .select2-selection--single .select2-selection__rendered {
             color: red !important;
         }
 
-        /* Ubah warna highlight saat opsi di-hover */
         .select2-container--default .select2-results__option--highlighted {
             background-color: rgba(255, 0, 0, 0.2) !important;
             color: red !important;
         }
         #sidenav-main {
-            z-index: 1030 !important; /* sidebar tetap di bawah modal dan backdrop */
+            z-index: 1030 !important;
         }
 
         .modal-backdrop {
-            z-index: 1040 !important; /* backdrop di atas sidebar */
+            z-index: 1040 !important;
         }
 
         .modal {
-            z-index: 1050 !important; /* modal tetap paling atas */
+            z-index: 1050 !important;
+        }
+        @media print {
+        .btn-print, nav, .breadcrumb, .set-time-dropdown {
+            display: none !important;
+        }
+        canvas {
+            max-width: 100% !important;
+        }
+        }
+
+          .pagination .page-item.active .page-link {
+            background-color: #262626;
+            border-color: #262626;
+            color: white;
+        }
+
+        .pagination .page-item .page-link {
+            color: #262626;
+        }
+
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d;
+        }
+
+        .pagination .page-link {
+            border-radius: 50%;
+            padding: 10px 15px;
+            font-weight: bold;
         }
     </style>
 
@@ -97,7 +121,7 @@
             <div class="container-fluid py-1 px-3">
               <nav aria-label="breadcrumb">
                 <ol class="breadcrumb bg-transparent mb-0 pb-0 pt-1 px-0 me-sm-6 me-5">
-                  <li class="breadcrumb-item text-sm"><a class="opacity-5 text-dark" href="javascript:;">Pages</a></li>
+                  <li class="breadcrumb-item text-sm"><p class="opacity-5 text-dark mb-0 text-sm" >Pages</p></li>
                   <li class="breadcrumb-item text-sm text-dark active breadcrumb-position" aria-current="page">@yield('breadcrumb')</li>
                 </ol>
               </nav>
@@ -252,244 +276,16 @@
                 }
             });
 
+            $('.select2').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: "-- Search and select --",
+                allowClear: true
+            });
+
 
         });
 
-    </script>
-    <script>
-        // var ctx = document.getElementById("chart-bars").getContext("2d");
-
-        // new Chart(ctx, {
-        //     type: "bar",
-        //     data: {
-        //         labels: ["M", "T", "W", "T", "F", "S", "S"],
-        //         datasets: [{
-        //             label: "Views",
-        //             tension: 0.4,
-        //             borderWidth: 0,
-        //             borderRadius: 4,
-        //             borderSkipped: false,
-        //             backgroundColor: "#43A047",
-        //             data: [50, 45, 22, 28, 50, 60, 76],
-        //             barThickness: 'flex'
-        //         }, ],
-        //     },
-        //     options: {
-        //         responsive: true,
-        //         maintainAspectRatio: false,
-        //         plugins: {
-        //             legend: {
-        //                 display: false,
-        //             }
-        //         },
-        //         interaction: {
-        //             intersect: false,
-        //             mode: 'index',
-        //         },
-        //         scales: {
-        //             y: {
-        //                 grid: {
-        //                     drawBorder: false,
-        //                     display: true,
-        //                     drawOnChartArea: true,
-        //                     drawTicks: false,
-        //                     borderDash: [5, 5],
-        //                     color: '#e5e5e5'
-        //                 },
-        //                 ticks: {
-        //                     suggestedMin: 0,
-        //                     suggestedMax: 500,
-        //                     beginAtZero: true,
-        //                     padding: 10,
-        //                     font: {
-        //                         size: 14,
-        //                         lineHeight: 2
-        //                     },
-        //                     color: "#737373"
-        //                 },
-        //             },
-        //             x: {
-        //                 grid: {
-        //                     drawBorder: false,
-        //                     display: false,
-        //                     drawOnChartArea: false,
-        //                     drawTicks: false,
-        //                     borderDash: [5, 5]
-        //                 },
-        //                 ticks: {
-        //                     display: true,
-        //                     color: '#737373',
-        //                     padding: 10,
-        //                     font: {
-        //                         size: 14,
-        //                         lineHeight: 2
-        //                     },
-        //                 }
-        //             },
-        //         },
-        //     },
-        // });
-
-
-        // var ctx2 = document.getElementById("chart-line").getContext("2d");
-
-        // new Chart(ctx2, {
-        //     type: "line",
-        //     data: {
-        //         labels: ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"],
-        //         datasets: [{
-        //             label: "Sales",
-        //             tension: 0,
-        //             borderWidth: 2,
-        //             pointRadius: 3,
-        //             pointBackgroundColor: "#43A047",
-        //             pointBorderColor: "transparent",
-        //             borderColor: "#43A047",
-        //             backgroundColor: "transparent",
-        //             fill: true,
-        //             data: [120, 230, 130, 440, 250, 360, 270, 180, 90, 300, 310, 220],
-        //             maxBarThickness: 6
-
-        //         }],
-        //     },
-        //     options: {
-        //         responsive: true,
-        //         maintainAspectRatio: false,
-        //         plugins: {
-        //             legend: {
-        //                 display: false,
-        //             },
-        //             tooltip: {
-        //                 callbacks: {
-        //                     title: function(context) {
-        //                         const fullMonths = ["January", "February", "March", "April", "May", "June",
-        //                             "July", "August", "September", "October", "November", "December"
-        //                         ];
-        //                         return fullMonths[context[0].dataIndex];
-        //                     }
-        //                 }
-        //             }
-        //         },
-        //         interaction: {
-        //             intersect: false,
-        //             mode: 'index',
-        //         },
-        //         scales: {
-        //             y: {
-        //                 grid: {
-        //                     drawBorder: false,
-        //                     display: true,
-        //                     drawOnChartArea: true,
-        //                     drawTicks: false,
-        //                     borderDash: [4, 4],
-        //                     color: '#e5e5e5'
-        //                 },
-        //                 ticks: {
-        //                     display: true,
-        //                     color: '#737373',
-        //                     padding: 10,
-        //                     font: {
-        //                         size: 12,
-        //                         lineHeight: 2
-        //                     },
-        //                 }
-        //             },
-        //             x: {
-        //                 grid: {
-        //                     drawBorder: false,
-        //                     display: false,
-        //                     drawOnChartArea: false,
-        //                     drawTicks: false,
-        //                     borderDash: [5, 5]
-        //                 },
-        //                 ticks: {
-        //                     display: true,
-        //                     color: '#737373',
-        //                     padding: 10,
-        //                     font: {
-        //                         size: 12,
-        //                         lineHeight: 2
-        //                     },
-        //                 }
-        //             },
-        //         },
-        //     },
-        // });
-
-        // var ctx3 = document.getElementById("chart-line-tasks").getContext("2d");
-
-        // new Chart(ctx3, {
-        //     type: "line",
-        //     data: {
-        //         labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-        //         datasets: [{
-        //             label: "Tasks",
-        //             tension: 0,
-        //             borderWidth: 2,
-        //             pointRadius: 3,
-        //             pointBackgroundColor: "#43A047",
-        //             pointBorderColor: "transparent",
-        //             borderColor: "#43A047",
-        //             backgroundColor: "transparent",
-        //             fill: true,
-        //             data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
-        //             maxBarThickness: 6
-
-        //         }],
-        //     },
-        //     options: {
-        //         responsive: true,
-        //         maintainAspectRatio: false,
-        //         plugins: {
-        //             legend: {
-        //                 display: false,
-        //             }
-        //         },
-        //         interaction: {
-        //             intersect: false,
-        //             mode: 'index',
-        //         },
-        //         scales: {
-        //             y: {
-        //                 grid: {
-        //                     drawBorder: false,
-        //                     display: true,
-        //                     drawOnChartArea: true,
-        //                     drawTicks: false,
-        //                     borderDash: [4, 4],
-        //                     color: '#e5e5e5'
-        //                 },
-        //                 ticks: {
-        //                     display: true,
-        //                     padding: 10,
-        //                     color: '#737373',
-        //                     font: {
-        //                         size: 14,
-        //                         lineHeight: 2
-        //                     },
-        //                 }
-        //             },
-        //             x: {
-        //                 grid: {
-        //                     drawBorder: false,
-        //                     display: false,
-        //                     drawOnChartArea: false,
-        //                     drawTicks: false,
-        //                     borderDash: [4, 4]
-        //                 },
-        //                 ticks: {
-        //                     display: true,
-        //                     color: '#737373',
-        //                     padding: 10,
-        //                     font: {
-        //                         size: 14,
-        //                         lineHeight: 2
-        //                     },
-        //                 }
-        //             },
-        //         },
-        //     },
-        // });
     </script>
     <script>
         var win = navigator.platform.indexOf('Win') > -1;

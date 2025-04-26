@@ -19,6 +19,17 @@
                                 @include('components.form-discount-super-admin')
                             @endif
                             <div class="mb-3">
+                                <label class="form-label">Status</label>
+                                <select name="status" id="status" class="form-select select2 bg-transparent border p-2">
+                                    <option value="" selected disabled>-- Select and search --</option>
+                                    <option value="active" {{ ($discount->status ?? '') == 'active' ? 'selected' : '' }}>
+                                        Active</option>
+                                    <option value="inactive"
+                                        {{ ($discount->status ?? '') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+
+                                </select>
+                            </div>
+                            <div class="mb-3">
                                 <label class="form-label">Start Date</label>
                                 <input type="date" name="start_date" class="form-control border p-2" required>
                             </div>
@@ -26,7 +37,7 @@
                                 <label class="form-label">End Date</label>
                                 <input type="date" name="end_date" class="form-control border p-2" required>
                             </div>
-                             <input type="hidden" name="type" id="type" id="type" class="form-control">
+                            <input type="hidden" name="type" id="type" id="type" class="form-control">
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -39,7 +50,9 @@
                                         <option value="{{ $product->id }}" data-name="{{ $product->product_name }}"
                                             data-code="{{ $product->product_code }}"
                                             data-stocks="{{ $product->incoming_stocks->sum('current_stocks') ?? 0 }}"
-                                            data-price="{{ $product->price }}" {{$product->id == ($productId ?? "") ? "selected" : ""}}>{{ $product->product_name }} -
+                                            data-price="{{ $product->price }}"
+                                            {{ $product->id == ($productId ?? '') ? 'selected' : '' }}>
+                                            {{ $product->product_name }} -
                                             {{ $product->product_code }}</option>
                                     @endforeach
                                 </select>
@@ -103,6 +116,11 @@
                                     required>
                             </div>
                         </div>
+                        <div class="col-12 ps-3">
+                            <button type="button" class="btn btn-outline-secondary px-5"
+                                onclick="window.history.back()">Back</button>
+                                <button type="submit" class="btn bg-gradient-dark ms-2 px-5">Submit</button>
+                        </div>
                     @elseif (request('type') == 'percentage_off')
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -113,6 +131,18 @@
                                 @include('components.form-discount-super-admin')
                             @endif
                             <div class="mb-3">
+                                <label class="form-label">Status</label>
+                                <select name="status" id="status"
+                                    class="form-select select2 bg-transparent border p-2">
+                                    <option value="" selected disabled>-- Select and search --</option>
+                                    <option value="active" {{ ($discount->status ?? '') == 'active' ? 'selected' : '' }}>
+                                        Active</option>
+                                    <option value="inactive"
+                                        {{ ($discount->status ?? '') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+
+                                </select>
+                            </div>
+                            <div class="mb-3">
                                 <label class="form-label">Start Date</label>
                                 <input type="date" name="start_date" class="form-control border p-2" required>
                             </div>
@@ -120,7 +150,7 @@
                                 <label class="form-label">End Date</label>
                                 <input type="date" name="end_date" class="form-control border p-2" required>
                             </div>
-                             <input type="hidden" name="type" id="type" class="form-control">
+                            <input type="hidden" name="type" id="type" class="form-control">
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -133,7 +163,9 @@
                                         <option value="{{ $product->id }}" data-name="{{ $product->product_name }}"
                                             data-code="{{ $product->product_code }}"
                                             data-stocks="{{ $product->incoming_stocks->sum('current_stocks') ?? 0 }}"
-                                            data-price="{{ $product->price }}" {{$product->id == ($productId ?? "") ? "selected" : ""}}>{{ $product->product_name }} -
+                                            data-price="{{ $product->price }}"
+                                            {{ $product->id == ($productId ?? '') ? 'selected' : '' }}>
+                                            {{ $product->product_name }} -
                                             {{ $product->product_code }}</option>
                                     @endforeach
                                 </select>
@@ -163,11 +195,16 @@
                             <div class="mb-3">
                                 <label class="form-label">Discount Percentage</label>
                                 <input type="number" name="discount_percentage" id="discount_percentage"
-                                    class="form-control border p-2" required disabled min="0" max="100">
+                                    class="form-control border p-2" required disabled min="0" max="99">
                             </div>
                             <p class="text-sm mb-0 ms-1"><span class="text-bold">Discount Price :</span> <span
                                     id="show_discount_price"></span></p>
                             <input type="number" name="discount_price" class="form-control border p-2" hidden>
+                        </div>
+                        <div class="col-12 ps-3">
+                            <button type="button" class="btn btn-outline-secondary px-5"
+                                onclick="window.history.back()">Back</button>
+                                <button type="submit" class="btn bg-gradient-dark ms-2 px-5">Submit</button>
                         </div>
                     @elseif (request('type') == 'cheap_redemption')
                         <div class="col-md-6">
@@ -178,6 +215,18 @@
                             @if (auth()->user()->role === 'super_admin')
                                 @include('components.form-discount-super-admin')
                             @endif
+                            <div class="mb-3">
+                                <label class="form-label">Status</label>
+                                <select name="status" id="status"
+                                    class="form-select select2 bg-transparent border p-2">
+                                    <option value="" selected disabled>-- Select and search --</option>
+                                    <option value="active" {{ ($discount->status ?? '') == 'active' ? 'selected' : '' }}>
+                                        Active</option>
+                                    <option value="inactive"
+                                        {{ ($discount->status ?? '') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+
+                                </select>
+                            </div>
                             <div class="mb-3">
                                 <label class="form-label">Start Date</label>
                                 <input type="date" name="start_date" class="form-control border p-2" required>
@@ -203,7 +252,9 @@
                                         <option value="{{ $product->id }}" data-name="{{ $product->product_name }}"
                                             data-code="{{ $product->product_code }}"
                                             data-stocks="{{ $product->incoming_stocks->sum('current_stocks') ?? 0 }}"
-                                            data-price="{{ $product->price }}"  {{$product->id == ($productId ?? "") ? "selected" : ""}}>{{ $product->product_name }} -
+                                            data-price="{{ $product->price }}"
+                                            {{ $product->id == ($productId ?? '') ? 'selected' : '' }}>
+                                            {{ $product->product_name }} -
                                             {{ $product->product_code }}</option>
                                     @endforeach
                                 </select>
@@ -236,7 +287,12 @@
                                     class="form-control border p-2" required disabled min="0">
                             </div>
                         </div>
-                    @elseif (request('type') == 'member')
+                        <div class="col-12 ps-3">
+                            <button type="button" class="btn btn-outline-secondary px-5"
+                                onclick="window.history.back()">Back</button>
+                                <button type="submit" class="btn bg-gradient-dark ms-2 px-5">Submit</button>
+                        </div>
+                    @elseif (request('type') == 'member' && auth()->user()->role === 'super_admin')
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label">Discount Name</label>
@@ -245,6 +301,18 @@
                             @if (auth()->user()->role === 'super_admin')
                                 @include('components.form-discount-super-admin')
                             @endif
+                            <div class="mb-3">
+                                <label class="form-label">Status</label>
+                                <select name="status" id="status"
+                                    class="form-select select2 bg-transparent border p-2">
+                                    <option value="" selected disabled>-- Select and search --</option>
+                                    <option value="active" {{ ($discount->status ?? '') == 'active' ? 'selected' : '' }}>
+                                        Active</option>
+                                    <option value="inactive"
+                                        {{ ($discount->status ?? '') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+
+                                </select>
+                            </div>
                             <div class="mb-3">
                                 <label class="form-label">Start Date</label>
                                 <input type="date" name="start_date" class="form-control border p-2" required>
@@ -261,12 +329,14 @@
                                 <select name="products_id" id="products_id"
                                     class="form-select select2 bg-transparent border p-2"
                                     aria-label="Default select example">
-                                    <option value="" selected disabled >Select and search</option>
+                                    <option value="" selected disabled>Select and search</option>
                                     @foreach ($products as $product)
                                         <option value="{{ $product->id }}" data-name="{{ $product->product_name }}"
                                             data-code="{{ $product->product_code }}"
                                             data-stocks="{{ $product->incoming_stocks->sum('current_stocks') ?? 0 }}"
-                                            data-price="{{ $product->price }}"  {{$product->id == ($productId ?? "") ? "selected" : ""}}>{{ $product->product_name }} -
+                                            data-price="{{ $product->price }}"
+                                            {{ $product->id == ($productId ?? '') ? 'selected' : '' }}>
+                                            {{ $product->product_name }} -
                                             {{ $product->product_code }}</option>
                                     @endforeach
                                 </select>
@@ -302,6 +372,17 @@
                                     id="show_discount_price"></span></p>
                             <input type="number" name="discount_price" class="form-control border p-2" hidden>
                         </div>
+                        <div class="col-12 ps-3">
+                            <button type="button" class="btn btn-outline-secondary px-5"
+                                onclick="window.history.back()">Back</button>
+                                <button type="submit" class="btn bg-gradient-dark ms-2 px-5">Submit</button>
+                        </div>
+                    @else
+                        <p>Not Found</p>
+                        <div class="col-12 ps-3">
+                            <button type="button" class="btn btn-outline-secondary px-5"
+                                onclick="window.history.back()">Back</button>
+                        </div>
                     @endif
                 @else
                     <div class="col-md-6">
@@ -319,17 +400,13 @@
                             </select>
                         </div>
                     </div>
+                    <div class="col-12 ps-3">
+                        <button type="button" class="btn btn-outline-secondary px-5"
+                        onclick="window.history.back()">Back</button>
+                        <button type="button" id="next-btn" class="btn bg-gradient-dark ms-2 px-5">Next</button>
+                    </div>
                 @endif
 
-                <div class="col-12 ps-3">
-                    <button type="button" class="btn btn-outline-secondary px-5"
-                        onclick="window.history.back()">Back</button>
-                    @if (!request('type'))
-                        <button type="button" id="next-btn" class="btn bg-gradient-dark ms-2 px-5">Next</button>
-                    @else
-                        <button type="submit" class="btn bg-gradient-dark ms-2 px-5">Submit</button>
-                    @endif
-                </div>
             </form>
 
         </div>
@@ -337,12 +414,12 @@
     </div>
     <script>
         $(document).ready(function() {
-            $('.select2').select2({
-                theme: 'bootstrap-5',
-                width: '100%',
-                placeholder: "-- Search and select --",
-                allowClear: true
-            });
+            // $('.select2').select2({
+            //     theme: 'bootstrap-5',
+            //     width: '100%',
+            //     placeholder: "-- Search and select --",
+            //     allowClear: true
+            // });
 
             $('#type').change(function() {
                 var selectedType = $(this).val();
@@ -370,8 +447,9 @@
 
                 if (selectedType) {
                     console.log(selectedType);
-                    const productId = @json($productId ??  null);
-                    window.location.href = `{{ route('discounts.create') }}?type=${selectedType}` + (productId ? `&product_id=${productId}`: '');
+                    const productId = @json($productId ?? null);
+                    window.location.href = `{{ route('discounts.create') }}?type=${selectedType}` + (
+                        productId ? `&product_id=${productId}` : '');
                 }
             });
 
@@ -397,12 +475,15 @@
                 let productPrice = selectedProduct.data('price');
                 let productStocks = selectedProduct.data('stocks') ?? 0;
 
-                $(`#${detailIdPrefix}_name`).text(productName);
+                if (productStocks && selectedProduct && productName && productCode && productPrice) {
+                    $(`#${detailIdPrefix}_name`).text(productName);
                     $(`#${detailIdPrefix}_code`).text(productCode);
                     $(`#${detailIdPrefix}_price`).text("Rp " + parseInt(productPrice).toLocaleString("id-ID"));
                     $(`#${detailIdPrefix}_stocks`).text(productStocks);
-
                     $(`#${detailIdPrefix}_detail`).show();
+                } else {
+                    $(`#${detailIdPrefix}_detail`).hide();
+                }
 
             }
 
@@ -415,7 +496,7 @@
 
             });
 
-           if($('#products_id').val()){
+            if ($('#products_id').val()) {
                 $('#products_id').trigger('change');
             }
 
@@ -425,7 +506,7 @@
             });
 
             function discountPrice(selectedId, discountPercentage, showDiscountPriceId, discountPrice,
-            minQuantity) {
+                minQuantity) {
                 var selectedProduct = $(selectedId).find('option:selected');
                 var productPrice = selectedProduct.data('price');
 

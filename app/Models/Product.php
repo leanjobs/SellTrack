@@ -21,7 +21,24 @@ class Product extends Model
         return $this->hasMany(IncomingStock::class, 'products_id');
     }
 
-    // public function outgoing_stocks(){
-    //     return $this->hasMany(OutgoingStock::class, 'products_id');
+    public function detail_discounts() {
+        return $this->hasMany(DetailDiscount::class, 'products_id');
+    }
+
+    // public function discounts() {
+    //     return $this->hasManyThrough( Discount::class, DetailDiscount::class,'products_id', 'detail_discounts_id', 'id', 'id'  );
     // }
+
+    public function discounts()
+    {
+        return $this->hasManyThrough(
+            Discount::class,
+            DetailDiscount::class,
+            'products_id',           // FK di DetailDiscount yang ke Product
+            'detail_discounts_id',   // FK di Discount yang ke DetailDiscount
+            'id',                    // PK di Product
+            'id'                     // PK di DetailDiscount
+        );
+    }
+
 }

@@ -14,28 +14,28 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Province</label>
-                        <select name="province" class="form-select border p-2" aria-label="Default select example"
+                        <select name="province" class="form-select border select2 p-2" aria-label="Default select example"
                             id="province">
                             <option value="" selected disabled>-- Select a Provice --</option>
                         </select>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">City</label>
-                        <select name="city" class="form-select border p-2" aria-label="Default select example"
+                        <select name="city" class="form-select select2 border p-2" aria-label="Default select example"
                             id="city">
                             <option value="" selected disabled>-- Select a City --</option>
                         </select>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Sub Distict</label>
-                        <select name="sub_district" class="form-select border p-2" aria-label="Default select example"
+                        <select name="sub_district" class="form-select select2 border p-2" aria-label="Default select example"
                             id="sub_district">
                             <option value="" selected disabled>-- Select a Sub District --</option>
                         </select>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Postal Code</label>
-                        <select name="postal_code" class="form-select border p-2" aria-label="Default select example"
+                        <select name="postal_code" class="form-select select2 border p-2" aria-label="Default select example"
                             id="postal_code">
                             <option value="" selected disabled>-- Select a Postal Code --</option>
                         </select>
@@ -95,7 +95,6 @@
 
             $('#province').change(function() {
                 let province_id = $(this).val();
-                console.log(province_id);
 
                 $('#city').prop('disabled', true).html(
                     '<option value="">-- Select a City --</option>');

@@ -38,7 +38,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Branch</label>
-                        <select name="branches_id" class="form-select border p-2" aria-label="Default select example"
+                        <select name="branches_id" class="form-select select2 border p-2" aria-label="Default select example"
                         id="categories_id" id="">
                         <option value="" selected disabled>-- Select a branch --</option>
                             @foreach ($branches as $branch)
